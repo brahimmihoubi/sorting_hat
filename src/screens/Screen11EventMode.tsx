@@ -31,6 +31,9 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedPresentation, setSelectedPresentation] = useState<string | null>(null);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showStageCeremonyModal, setShowStageCeremonyModal] = useState(false);
+  const [ceremonyStep, setCeremonyStep] = useState<'idle' | 'sorting' | 'revealed'>('idle');
+  const [stageParticipant, setStageParticipant] = useState({ name: 'Anis Belhadj', dept: 'development' });
 
   const toggleFullscreen = () => {
     sounds.playClick();
@@ -94,9 +97,10 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
           <button
             onClick={() => {
               sounds.playChime(650);
-              onStartTest();
+              setShowStageCeremonyModal(true);
+              setCeremonyStep('idle');
             }}
-            className="btn-notch-primary px-5 py-2 text-xs sm:text-sm flex items-center gap-2"
+            className="btn-notch-primary px-5 py-2 text-xs sm:text-sm flex items-center gap-2 cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
             <span>Start Presentation</span>
@@ -410,6 +414,106 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
               Explore the mission, leadership team, and ongoing flagship projects of the{' '}
               {selectedPresentation} Department.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Live Stage Ceremony Auditorium Presentation Modal */}
+      {showStageCeremonyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 sm:p-8 animate-in fade-in">
+          <div className="max-w-4xl w-full rounded-3xl border-2 border-amber-500/60 bg-gradient-to-b from-[#0b0d18] via-[#101322] to-[#080911] p-6 sm:p-10 space-y-6 shadow-[0_0_80px_rgba(245,158,11,0.3)] relative text-center">
+            <button
+              onClick={() => setShowStageCeremonyModal(false)}
+              className="absolute top-4 right-4 p-2 text-amber-400 hover:text-amber-100 rounded-full bg-slate-900 border border-amber-500/40 cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="text-xs font-fantasy font-bold tracking-widest text-amber-400 uppercase">
+              ✦ SDG WELCOME DAY 2026 · LIVE AUDITORIUM CEREMONY ✦
+            </div>
+
+            <h2 className="text-2xl sm:text-4xl font-extrabold font-fantasy text-amber-100">
+              {ceremonyStep === 'idle'
+                ? `Sorting Candidate: ${stageParticipant.name}`
+                : ceremonyStep === 'sorting'
+                ? 'The Hat is Deliberating Destiny...'
+                : `${stageParticipant.name} is Sorted into ${stageParticipant.dept.toUpperCase()}!`}
+            </h2>
+
+            <div className="w-24 h-0.5 bg-amber-500/40 mx-auto" />
+
+            {/* Central Hat Visualizer */}
+            <div className="relative mx-auto w-48 sm:w-60 h-48 sm:h-60 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-amber-400/40 animate-[spin_6s_linear_infinite]" />
+              <img
+                src={ASSETS.hatCloseup}
+                alt="Enchanted Sorting Hat"
+                className="w-40 sm:w-48 h-40 sm:h-48 object-cover rounded-full border-2 border-amber-500/70 shadow-[0_0_40px_rgba(245,158,11,0.5)]"
+              />
+              <div className="absolute -bottom-2 bg-amber-950/95 border border-amber-400/60 px-4 py-1 rounded-full text-amber-200 text-xs font-fantasy shadow-lg">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin inline mr-1" />
+                <span>Stage Ceremony Mode</span>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+              {ceremonyStep === 'idle' && (
+                <button
+                  onClick={() => {
+                    sounds.playSortingResonance();
+                    setCeremonyStep('sorting');
+                    setTimeout(() => {
+                      sounds.playHatRumble();
+                    }, 1800);
+                    setTimeout(() => {
+                      sounds.playDepartmentReveal(stageParticipant.dept);
+                      setCeremonyStep('revealed');
+                    }, 3000);
+                  }}
+                  className="btn-notch-primary px-8 py-3 text-sm sm:text-base flex items-center gap-2 cursor-pointer shadow-xl"
+                >
+                  <Play className="w-5 h-5 fill-current" />
+                  <span>Start Live Sorting Ritual</span>
+                </button>
+              )}
+
+              {ceremonyStep === 'sorting' && (
+                <div className="text-amber-300 font-mono text-sm animate-pulse flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                  <span>Analyzing energy & matching house portal...</span>
+                </div>
+              )}
+
+              {ceremonyStep === 'revealed' && (
+                <div className="space-y-4">
+                  <div className="text-xl sm:text-2xl font-bold font-fantasy text-amber-200">
+                    Welcome to the {stageParticipant.dept.replace('_', ' ').toUpperCase()} Department!
+                  </div>
+                  <button
+                    onClick={() => {
+                      sounds.playClick();
+                      const names = ['Lina Benseghir', 'Farid Belhadj', 'Yacine Amrani', 'Amira Zineddine'];
+                      const depts: ('development' | 'design' | 'events' | 'social_media')[] = [
+                        'development',
+                        'design',
+                        'events',
+                        'social_media',
+                      ];
+                      setStageParticipant({
+                        name: names[Math.floor(Math.random() * names.length)],
+                        dept: depts[Math.floor(Math.random() * depts.length)],
+                      });
+                      setCeremonyStep('idle');
+                    }}
+                    className="btn-notch-ghost px-6 py-2 text-xs sm:text-sm inline-flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>Sort Next Candidate</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

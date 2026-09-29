@@ -221,6 +221,9 @@ export default function App() {
 
         {currentScreen === 'sorting_animation' && (
           <Screen5SortingAnimation
+            answers={answers}
+            scores={scores}
+            departmentResult={departmentResult}
             onComplete={handleSortingAnimationComplete}
             onNavigate={setCurrentScreen}
           />
