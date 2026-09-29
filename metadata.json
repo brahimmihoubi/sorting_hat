@@ -1,0 +1,6 @@
+{
+  "name": "SDG Sorting Hat",
+  "description": "Interactive Welcome Day department-sorting platform for Setif Developers Group (SDG) featuring 12 interactive screens, weighted scoring, dark fantasy aesthetics, and event mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
