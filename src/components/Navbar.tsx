@@ -50,18 +50,24 @@ export const Navbar: FC<NavbarProps> = ({
             sounds.playClick();
             onNavigate('landing');
           }}
-          className="flex items-center gap-3 text-left group focus:outline-none"
+          className="flex items-center gap-3.5 text-left group focus:outline-none"
         >
-          {/* Flame Crest */}
-                     <img src={ASSETS.logo} alt="SDG Sorting Hat" className="w-8 h-8 mr-2" />
+          {/* Flame Crest Logo Container (Golden Metallic Button Theme) */}
+          <div className="relative w-11 h-11 sm:w-13 sm:h-13 shrink-0 flex items-center justify-center p-1.5 rounded-xl bg-gradient-to-b from-[#fde68a] via-[#f5b027] to-[#d97706] border-[1.5px] border-[#ffe899] shadow-[0_0_18px_rgba(245,175,40,0.5),inset_0_1.5px_0_rgba(255,255,255,0.85)] group-hover:shadow-[0_0_25px_rgba(251,191,36,0.75)] transition-all duration-300">
+            <img
+              src={ASSETS.logo}
+              alt="SDG Sorting Hat Logo"
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
           <div>
-            <div className="font-fantasy text-xl font-bold tracking-wider text-amber-200 group-hover:text-amber-100 transition-colors flex items-center gap-1.5">
+            <div className="font-fantasy text-xl sm:text-2xl font-bold tracking-wider text-amber-200 group-hover:text-amber-100 transition-colors flex items-center gap-2">
               SDG
-              <span className="text-xs px-1.5 py-0.5 rounded text-amber-300 bg-amber-950/60 border border-amber-500/30 font-sans font-medium tracking-normal">
+              <span className="text-xs px-2 py-0.5 rounded-md text-amber-300 bg-amber-950/80 border border-amber-500/40 font-sans font-semibold tracking-normal shadow-xs">
                 Sorting Hat
               </span>
             </div>
-            <div className="text-[10px] tracking-widest uppercase text-amber-400/60 font-sans font-medium">
+            <div className="text-[10px] sm:text-[11px] tracking-widest uppercase text-amber-400/70 font-sans font-semibold">
               Setif Developers Group
             </div>
           </div>

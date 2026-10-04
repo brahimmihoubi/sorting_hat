@@ -1,6 +1,7 @@
 import { useState, FC, FormEvent } from 'react';
 import { DepartmentId } from '../types';
 import { sounds } from '../utils/audio';
+import { ASSETS } from '../assets';
 import { X, Check, Sparkles, Send } from 'lucide-react';
 
 interface JoinModalProps {
@@ -44,7 +45,14 @@ export const JoinModal: FC<JoinModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        <div className="text-center space-y-1">
+        <div className="text-center space-y-2">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-2xl bg-gradient-to-b from-[#fde68a] via-[#f5b027] to-[#d97706] border-[1.5px] border-[#ffe899] p-2 shadow-[0_0_20px_rgba(245,175,40,0.5),inset_0_1.5px_0_rgba(255,255,255,0.85)] flex items-center justify-center">
+            <img
+              src={ASSETS.logo}
+              alt="SDG Sorting Hat Logo"
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+            />
+          </div>
           <div className="text-xs font-fantasy font-bold tracking-widest uppercase text-amber-900">
             ✦ JOIN SETIF DEVELOPERS GROUP ✦
           </div>

@@ -114,7 +114,7 @@
 /* Golden Metallic Notched Banner Button (Smooth Warm Gold - Matching Screenshot) */
 .btn-golden-hat {
   background: linear-gradient(180deg, #fde68a 0%, #f5b027 50%, #d97706 100%);
-  color: #1e1103;
+  color: #000000;
   font-family: 'Cinzel', serif;
   font-weight: 700;
   border: 1.5px solid #ffe899;
@@ -143,7 +143,7 @@
 /* PRIMARY – golden metallic fill (same as GoldenHatButton, without icon emblem) */
 .btn-notch-primary {
   background: linear-gradient(180deg, #fde68a 0%, #f5b027 50%, #d97706 100%);
-  color: #1e1103;
+  color: #000000;
   font-family: 'Cinzel', serif;
   font-weight: 700;
   border: 1.5px solid #ffe899;
@@ -201,7 +201,7 @@
 /* PARCHMENT – warm parchment fill with dark border (buttons on light parchment cards) */
 .btn-notch-parchment {
   background: linear-gradient(180deg, #f7eed8 0%, #e8d09a 50%, #c8a84b 100%);
-  color: #2b1d0c;
+  color: #000000;
   font-family: 'Cinzel', serif;
   font-weight: 700;
   border: 1.5px solid #c8a84b;

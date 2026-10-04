@@ -27,24 +27,24 @@ export const GoldenHatButton: FC<GoldenHatButtonProps> = ({
     >
       <div className="flex items-center gap-2 sm:gap-2.5 z-10">
         {/* Left Sorting Hat Emblem */}
-        <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center p-0.5 group-hover:scale-110 transition-transform shrink-0">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-0.5 group-hover:scale-110 transition-transform shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
           <img
             src={ASSETS.logo}
             alt="Sorting Hat Crest"
-            className="w-full h-full object-contain filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+            className="w-full h-full object-contain"
           />
         </div>
 
         {/* Center Title Case Serif Text */}
         <div className="flex flex-col text-center sm:text-left">
-          <span className="font-fantasy font-bold text-amber-950 text-xs sm:text-sm tracking-wide leading-tight">
+          <span className="font-fantasy font-bold text-black text-xs sm:text-sm tracking-wide leading-tight">
             {text}
           </span>
         </div>
 
         {/* Right Arrow */}
         {showArrow && (
-          <span className="text-amber-950 font-bold text-xs sm:text-sm transition-transform group-hover:translate-x-1 shrink-0">
+          <span className="text-black font-bold text-xs sm:text-sm transition-transform group-hover:translate-x-1 shrink-0">
             →
           </span>
         )}
