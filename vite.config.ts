@@ -5,6 +5,8 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // SPA mode: serve index.html for all routes (including /admin)
+    appType: 'spa' as const,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

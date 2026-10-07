@@ -60,17 +60,24 @@ export const ScreenSwitcherBar: FC<ScreenSwitcherBarProps> = ({
           <div className="space-y-1">
             {SCREEN_CONFIG.map((item) => {
               const active = item.id === currentScreen;
+              const isAdminItem = item.id === 'admin_dashboard';
               return (
                 <button
                   key={item.id}
                   onClick={() => {
                     sounds.playClick();
+                    if (isAdminItem) {
+                      window.location.href = '/admin';
+                      return;
+                    }
                     onSelectScreen(item.id);
                     setIsOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-all ${
                     active
                       ? 'bg-amber-600/25 border border-amber-400/60 text-amber-100 font-semibold'
+                      : isAdminItem
+                      ? 'hover:bg-rose-950/40 text-rose-300/60 hover:text-rose-200 border border-transparent'
                       : 'hover:bg-amber-950/40 text-amber-200/70 hover:text-amber-200 border border-transparent'
                   }`}
                 >
@@ -88,6 +95,9 @@ export const ScreenSwitcherBar: FC<ScreenSwitcherBarProps> = ({
                   </div>
                   {active && (
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]" />
+                  )}
+                  {isAdminItem && !active && (
+                    <ExternalLink className="w-3 h-3 text-rose-400/60 shrink-0" />
                   )}
                 </button>
               );

@@ -8,12 +8,14 @@ interface NavbarProps {
   currentScreen: ScreenId;
   onNavigate: (screen: ScreenId) => void;
   onOpenJoinModal?: () => void;
+  onOpenApiConnector?: () => void;
 }
 
 export const Navbar: FC<NavbarProps> = ({
   currentScreen,
   onNavigate,
   onOpenJoinModal,
+  onOpenApiConnector,
 }) => {
   const [soundOn, setSoundOn] = useState(true);
   const [musicOn, setMusicOn] = useState(false);
@@ -119,6 +121,21 @@ export const Navbar: FC<NavbarProps> = ({
 
         {/* Zone 3: Primary Actions */}
         <div className="flex items-center gap-3">
+          {/* API Backend Connector Button */}
+          {onOpenApiConnector && (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenApiConnector();
+              }}
+              className="h-9 px-3 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 text-emerald-400 flex items-center gap-1.5 text-xs font-mono font-semibold transition-all cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+              title="FastAPI Backend API Connector (http://localhost:8000/api)"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="hidden sm:inline">API 8000</span>
+            </button>
+          )}
+
           {/* Theme Music Toggle */}
           <button
             onClick={toggleMusic}
