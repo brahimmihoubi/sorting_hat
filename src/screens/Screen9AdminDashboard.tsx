@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { ParticipantInfo, ScreenId } from '../types';
 import { sounds } from '../utils/audio';
 import { ASSETS } from '../assets';
+import { BackendAdminStats } from '../services/api';
 import {
   Users,
   Code,
@@ -22,19 +23,59 @@ import {
 
 interface Screen9AdminDashboardProps {
   participants: ParticipantInfo[];
+  /** Live backend statistics; null when not yet loaded or backend offline */
+  stats?: BackendAdminStats | null;
+  statsLoading?: boolean;
   onNavigate: (screen: ScreenId) => void;
   onAddParticipant: (newP: ParticipantInfo) => void;
+  /** Triggers a re-fetch of stats from the backend */
+  onRefresh?: () => void;
 }
 
 export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
   participants,
+  stats,
+  statsLoading = false,
   onNavigate,
   onAddParticipant,
+  onRefresh,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('all');
   const [showSimulateModal, setShowSimulateModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'participants' | 'settings'>('dashboard');
+
+  // ── Derived stats (prefer backend, fall back to local list) ───────────
+  const totalParticipants = stats?.total_participants ?? participants.length;
+  const completedCount = stats?.completed_participants ?? participants.filter((p) => p.status === 'Completed').length;
+  const inProgressCount = stats?.in_progress_participants ?? participants.filter((p) => p.status !== 'Completed').length;
+  const completionRate = stats?.completion_rate_percentage
+    ?? (participants.length > 0 ? Math.round((completedCount / participants.length) * 100) : 0);
+
+  const dist = stats?.department_distribution;
+  const devCount  = dist?.development?.count  ?? participants.filter((p) => p.department === 'development').length;
+  const desCount  = dist?.design?.count        ?? participants.filter((p) => p.department === 'design').length;
+  const evtCount  = dist?.events?.count        ?? participants.filter((p) => p.department === 'events').length;
+  const smCount   = dist?.social_media?.count  ?? participants.filter((p) => p.department === 'social_media').length;
+
+  const devPct  = dist?.development?.percentage  ?? (totalParticipants > 0 ? Math.round((devCount / totalParticipants) * 100) : 0);
+  const desPct  = dist?.design?.percentage        ?? (totalParticipants > 0 ? Math.round((desCount / totalParticipants) * 100) : 0);
+  const evtPct  = dist?.events?.percentage        ?? (totalParticipants > 0 ? Math.round((evtCount / totalParticipants) * 100) : 0);
+  const smPct   = dist?.social_media?.percentage  ?? (totalParticipants > 0 ? Math.round((smCount / totalParticipants) * 100) : 0);
+
+  // Donut: circumference ≈ 251.2 for r=40
+  const CIRC = 251.2;
+  const devDash = (devPct / 100) * CIRC;
+  const desDash = (desPct / 100) * CIRC;
+  const evtDash = (evtPct / 100) * CIRC;
+  const smDash  = (smPct  / 100) * CIRC;
+  const devOffset = 0;
+  const evtOffset = -(devDash);
+  const desOffset = -(devDash + evtDash);
+  const smOffset  = -(devDash + evtDash + desDash);
+
+  // Gauge
+  const gaugeDash = (completionRate / 100) * CIRC;
 
   const filtered = participants.filter((p) => {
     const matchesSearch =
@@ -130,23 +171,27 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Top 5 Stat Metrics Cards (Exact match to Screenshot 9) */}
+      {/* Top 5 Stat Metrics Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         {/* Total Participants */}
         <div className="p-4 rounded-xl bg-slate-900/80 border border-amber-500/40 shadow-lg">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-medium text-amber-200/70">Total Participants</span>
-            <Users className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center gap-1.5">
+              {onRefresh && (
+                <button onClick={() => { sounds.playClick(); onRefresh(); }} title="Refresh" className="text-amber-400/60 hover:text-amber-300 transition-colors">
+                  <RefreshCw className={`w-3 h-3 ${statsLoading ? 'animate-spin' : ''}`} />
+                </button>
+              )}
+              <Users className="w-4 h-4 text-amber-400" />
+            </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-amber-100">
-              {participants.length}
-            </span>
-            <span className="text-[10px] font-medium text-emerald-400 bg-emerald-950/50 px-1.5 py-0.5 rounded">
-              +12%
+            <span className={`text-2xl font-bold font-mono text-amber-100 ${statsLoading ? 'animate-pulse' : ''}`}>
+              {totalParticipants}
             </span>
           </div>
-          <span className="text-[10px] text-amber-200/40 mt-1 block">from last week</span>
+          <span className="text-[10px] text-amber-200/40 mt-1 block">{completedCount} completed</span>
         </div>
 
         {/* Development */}
@@ -156,11 +201,11 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <Code className="w-4 h-4 text-blue-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-blue-100">68</span>
-            <span className="text-xs text-blue-300 font-mono">27%</span>
+            <span className={`text-2xl font-bold font-mono text-blue-100 ${statsLoading ? 'animate-pulse' : ''}`}>{devCount}</span>
+            <span className="text-xs text-blue-300 font-mono">{devPct}%</span>
           </div>
           <div className="w-full h-1 bg-blue-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="w-[27%] h-full bg-blue-500" />
+            <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${devPct}%` }} />
           </div>
         </div>
 
@@ -171,11 +216,11 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <Palette className="w-4 h-4 text-rose-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-rose-100">54</span>
-            <span className="text-xs text-rose-300 font-mono">22%</span>
+            <span className={`text-2xl font-bold font-mono text-rose-100 ${statsLoading ? 'animate-pulse' : ''}`}>{desCount}</span>
+            <span className="text-xs text-rose-300 font-mono">{desPct}%</span>
           </div>
           <div className="w-full h-1 bg-rose-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="w-[22%] h-full bg-rose-500" />
+            <div className="h-full bg-rose-500 transition-all duration-500" style={{ width: `${desPct}%` }} />
           </div>
         </div>
 
@@ -186,11 +231,11 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <Calendar className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-emerald-100">72</span>
-            <span className="text-xs text-emerald-300 font-mono">29%</span>
+            <span className={`text-2xl font-bold font-mono text-emerald-100 ${statsLoading ? 'animate-pulse' : ''}`}>{evtCount}</span>
+            <span className="text-xs text-emerald-300 font-mono">{evtPct}%</span>
           </div>
           <div className="w-full h-1 bg-emerald-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="w-[29%] h-full bg-emerald-500" />
+            <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${evtPct}%` }} />
           </div>
         </div>
 
@@ -201,11 +246,11 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <Megaphone className="w-4 h-4 text-purple-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-purple-100">54</span>
-            <span className="text-xs text-purple-300 font-mono">22%</span>
+            <span className={`text-2xl font-bold font-mono text-purple-100 ${statsLoading ? 'animate-pulse' : ''}`}>{smCount}</span>
+            <span className="text-xs text-purple-300 font-mono">{smPct}%</span>
           </div>
           <div className="w-full h-1 bg-purple-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="w-[22%] h-full bg-purple-500" />
+            <div className="h-full bg-purple-500 transition-all duration-500" style={{ width: `${smPct}%` }} />
           </div>
         </div>
       </div>
@@ -219,58 +264,34 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
           </h3>
 
           <div className="flex items-center justify-between gap-4">
-            {/* SVG Donut Chart */}
+            {/* SVG Donut Chart — driven by live percentages */}
             <div className="relative w-32 h-32 flex items-center justify-center shrink-0">
               <svg className="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="#1e293b" strokeWidth="14" fill="transparent" />
-                {/* Dev (27%) */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  stroke="#3b82f6"
-                  strokeWidth="14"
-                  strokeDasharray="67.8 251.2"
-                  strokeDashoffset="0"
-                  fill="transparent"
-                />
-                {/* Events (29%) */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  stroke="#10b981"
-                  strokeWidth="14"
-                  strokeDasharray="72.8 251.2"
-                  strokeDashoffset="-67.8"
-                  fill="transparent"
-                />
-                {/* Design (22%) */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  stroke="#f43f5e"
-                  strokeWidth="14"
-                  strokeDasharray="55.2 251.2"
-                  strokeDashoffset="-140.6"
-                  fill="transparent"
-                />
-                {/* Social Media (22%) */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  stroke="#a855f7"
-                  strokeWidth="14"
-                  strokeDasharray="55.2 251.2"
-                  strokeDashoffset="-195.8"
-                  fill="transparent"
-                />
+                {/* Development */}
+                <circle cx="50" cy="50" r="40" stroke="#3b82f6" strokeWidth="14"
+                  strokeDasharray={`${devDash} ${CIRC}`}
+                  strokeDashoffset={devOffset}
+                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                {/* Events */}
+                <circle cx="50" cy="50" r="40" stroke="#10b981" strokeWidth="14"
+                  strokeDasharray={`${evtDash} ${CIRC}`}
+                  strokeDashoffset={evtOffset}
+                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                {/* Design */}
+                <circle cx="50" cy="50" r="40" stroke="#f43f5e" strokeWidth="14"
+                  strokeDasharray={`${desDash} ${CIRC}`}
+                  strokeDashoffset={desOffset}
+                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                {/* Social Media */}
+                <circle cx="50" cy="50" r="40" stroke="#a855f7" strokeWidth="14"
+                  strokeDasharray={`${smDash} ${CIRC}`}
+                  strokeDashoffset={smOffset}
+                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-mono text-xl font-bold text-amber-100">
-                  {participants.length}
+                <span className={`font-mono text-xl font-bold text-amber-100 ${statsLoading ? 'animate-pulse' : ''}`}>
+                  {totalParticipants}
                 </span>
                 <span className="text-[10px] text-amber-200/50">Total</span>
               </div>
@@ -283,28 +304,28 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
                   <span className="w-2 h-2 rounded-full bg-blue-500" />
                   <span className="text-slate-300">Development</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">68 (27%)</span>
+                <span className="font-mono text-amber-100 font-semibold">{devCount} ({devPct}%)</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-rose-500" />
                   <span className="text-slate-300">Design</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">54 (22%)</span>
+                <span className="font-mono text-amber-100 font-semibold">{desCount} ({desPct}%)</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   <span className="text-slate-300">Events</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">72 (29%)</span>
+                <span className="font-mono text-amber-100 font-semibold">{evtCount} ({evtPct}%)</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-purple-500" />
                   <span className="text-slate-300">Social Media</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">54 (22%)</span>
+                <span className="font-mono text-amber-100 font-semibold">{smCount} ({smPct}%)</span>
               </div>
             </div>
           </div>
@@ -365,27 +386,23 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <div className="relative w-24 h-24 flex items-center justify-center">
               <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="#1e293b" strokeWidth="10" fill="transparent" />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  stroke="#f59e0b"
-                  strokeWidth="10"
-                  strokeDasharray="218.6 251.2"
-                  strokeLinecap="round"
-                  fill="transparent"
-                />
+                <circle cx="50" cy="50" r="40" stroke="#f59e0b" strokeWidth="10"
+                  strokeDasharray={`${gaugeDash} ${CIRC}`}
+                  strokeLinecap="round" fill="transparent"
+                  style={{ transition: 'stroke-dasharray 0.6s ease' }} />
               </svg>
-              <span className="absolute font-mono text-xl font-bold text-amber-100">87%</span>
+              <span className={`absolute font-mono text-xl font-bold text-amber-100 ${statsLoading ? 'animate-pulse' : ''}`}>
+                {completionRate}%
+              </span>
             </div>
 
             <div className="space-y-2 text-xs">
               <div>
-                <span className="font-mono text-base font-bold text-emerald-400">216</span>
+                <span className={`font-mono text-base font-bold text-emerald-400 ${statsLoading ? 'animate-pulse' : ''}`}>{completedCount}</span>
                 <span className="text-[11px] text-slate-400 block">Completed</span>
               </div>
               <div>
-                <span className="font-mono text-base font-bold text-amber-400">32</span>
+                <span className={`font-mono text-base font-bold text-amber-400 ${statsLoading ? 'animate-pulse' : ''}`}>{inProgressCount}</span>
                 <span className="text-[11px] text-slate-400 block">In Progress</span>
               </div>
             </div>

@@ -80,10 +80,13 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
 
             {/* Center Stage Presentation Container */}
             <div className="relative w-full max-w-lg aspect-square sm:aspect-4/3 rounded-2xl overflow-hidden border border-amber-500/30 shadow-[0_20px_50px_rgba(0,0,0,0.8)] group">
-              <img
-                src={ASSETS.heroHall}
-                alt="SDG Sorting Hat in the Grand Hall"
-                referrerPolicy="no-referrer"
+              <video
+                src={ASSETS.heroVideo}
+                poster={ASSETS.heroHall}
+                autoPlay
+                loop
+                muted
+                playsInline
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-transparent to-transparent opacity-80" />

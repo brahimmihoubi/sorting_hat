@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ParticipantInfo } from './types';
 import { INITIAL_PARTICIPANTS } from './data/initialParticipants';
 import { apiService } from './services/api';
+import { useAdminStats } from './hooks/useAdminStats';
 import { sounds } from './utils/audio';
 import { MagicalBackground } from './components/MagicalBackground';
 import { AdminLoginScreen } from './screens/AdminLoginScreen';
@@ -51,8 +52,17 @@ export default function AdminApp() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isApiModalOpen, setIsApiModalOpen] = useState(false);
 
-  // Shared participants store via localStorage
-  const [participantsList, setParticipantsList] = useState<ParticipantInfo[]>(() => {
+  const {
+    stats,
+    statsLoading,
+    participants: liveParticipants,
+    participantsLoading,
+    refresh: refreshStats,
+  } = useAdminStats();
+
+  // Shared participants store — prefers backend data, falls back to localStorage.
+  // Admin actions (quick-add simulation) can still append locally.
+  const [localParticipantsList, setLocalParticipantsList] = useState<ParticipantInfo[]>(() => {
     try {
       const saved = localStorage.getItem('sdg_participants');
       return saved ? JSON.parse(saved) : INITIAL_PARTICIPANTS;
@@ -61,13 +71,19 @@ export default function AdminApp() {
     }
   });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('sdg_participants', JSON.stringify(participantsList));
-    } catch {
-      // ignore
-    }
-  }, [participantsList]);
+  // Merge: backend list takes precedence, local additions are appended.
+  const participantsList: ParticipantInfo[] = liveParticipants.length > 0
+    ? liveParticipants.map((p) => ({
+        id: p.id,
+        fullName: p.full_name,
+        email: p.email,
+        faculty: '',
+        studyYear: p.academic_year,
+        createdAt: new Date(p.created_at).toLocaleDateString(),
+        department: (p.department_slug as any) ?? undefined,
+        status: p.status === 'completed' ? 'Completed' : 'In Progress',
+      }))
+    : localParticipantsList;
 
   const handleLoginSuccess = (name: string, email: string) => {
     setAdminName(name);
@@ -82,7 +98,8 @@ export default function AdminApp() {
   };
 
   const handleAddParticipant = (newP: ParticipantInfo) => {
-    setParticipantsList((prev) => [newP, ...prev]);
+    setLocalParticipantsList((prev) => [newP, ...prev]);
+    refreshStats(); // also re-fetch from backend
   };
 
   // If not authenticated, render Login Screen
@@ -249,12 +266,15 @@ export default function AdminApp() {
           {activeTab === 'dashboard' && (
             <Screen9AdminDashboard
               participants={participantsList}
+              stats={stats}
+              statsLoading={statsLoading || participantsLoading}
               onNavigate={(screen) => {
                 if (screen !== 'admin_dashboard') {
                   window.location.href = '/';
                 }
               }}
               onAddParticipant={handleAddParticipant}
+              onRefresh={refreshStats}
             />
           )}
 

@@ -1,10 +1,40 @@
 /**
- * SDG Sorting Hat API Service Client
- * Handles communication with the FastAPI Backend (http://localhost:8000/api)
- * Supports token storage, health checks, public endpoints, and authenticated admin calls.
+ * SDG Sorting Hat — API Service Client
+ *
+ * Single source of truth for all communication with the FastAPI backend.
+ * Uses VITE_API_BASE_URL from .env (falls back to http://localhost:8000/api).
+ *
+ * Public flow:
+ *   1. registerParticipant()   → POST /api/participants
+ *   2. getQuestions()          → GET  /api/questions
+ *   3. submitSorting()         → POST /api/sort
+ *   4. getResult()             → GET  /api/results/{id}   (optional)
+ *
+ * Admin flow:
+ *   adminLogin()               → POST /api/admin/login
+ *   getAdminStatistics()       → GET  /api/admin/statistics
+ *   getAdminParticipants()     → GET  /api/admin/participants
+ *   getAdminResults()          → GET  /api/admin/results
+ *   … and full CRUD for departments / questions / answers / scoring rules
  */
 
-const DEFAULT_API_BASE_URL = 'http://localhost:8000/api';
+// ── Base URL ────────────────────────────────────────────────────────────────
+
+const DEFAULT_BASE = 'http://localhost:8000/api';
+
+function resolveBaseUrl(): string {
+  // 1. Vite env variable (set via .env → VITE_API_BASE_URL)
+  const fromEnv = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
+  if (fromEnv?.trim()) return fromEnv.trim().replace(/\/+$/, '');
+
+  // 2. Runtime override stored by the ApiConnector modal
+  const fromStorage = localStorage.getItem('sdg_api_base_url');
+  if (fromStorage?.trim()) return fromStorage.trim().replace(/\/+$/, '');
+
+  return DEFAULT_BASE;
+}
+
+// ── Public Types ─────────────────────────────────────────────────────────────
 
 export interface HealthCheckResponse {
   status: string;
@@ -12,6 +42,57 @@ export interface HealthCheckResponse {
   scoring_version?: string;
   database?: string;
 }
+
+/** A single answer option returned by the backend */
+export interface BackendAnswer {
+  id: string;
+  text: string;
+  display_order: number;
+}
+
+/** A single question returned by GET /api/questions */
+export interface BackendQuestion {
+  id: string;
+  text: string;
+  type: string;
+  display_order: number;
+  required: boolean;
+  answers: BackendAnswer[];
+}
+
+/** Response body from POST /api/participants */
+export interface BackendParticipant {
+  id: string;
+  full_name: string;
+  email: string;
+  academic_year: string;
+  session_token: string;
+  status: string;
+  created_at: string;
+}
+
+/** Department summary embedded in a sort result */
+export interface BackendDepartmentResult {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  color?: string;
+  description?: string;
+  short_description?: string;
+}
+
+/** Response body from POST /api/sort */
+export interface BackendSortResult {
+  result_id: string;
+  department: BackendDepartmentResult;
+  total_score: number;
+  scores: Record<string, number>;
+  scoring_version: string;
+  already_completed?: boolean;
+}
+
+// ── Admin Types ───────────────────────────────────────────────────────────────
 
 export interface AdminLoginResponse {
   access_token: string;
@@ -28,34 +109,61 @@ export interface BackendAdminStats {
   department_distribution: Record<string, { count: number; percentage: number }>;
 }
 
+export interface BackendAdminParticipant {
+  id: string;
+  full_name: string;
+  email: string;
+  academic_year: string;
+  status: string;
+  created_at: string;
+  completed_at?: string;
+  department_name?: string;
+  department_slug?: string;
+}
+
+export interface BackendAdminResult {
+  id: string;
+  participant_id: string;
+  participant_name: string;
+  participant_email: string;
+  department_name: string;
+  department_slug: string;
+  total_score: number;
+  scores_snapshot: Record<string, number>;
+  scoring_version: string;
+  created_at: string;
+}
+
+// ── ApiService Class ──────────────────────────────────────────────────────────
+
 class ApiService {
-  private baseUrl: string;
-  private token: string | null;
+  private _baseUrl: string;
+  private _token: string | null;
 
   constructor() {
-    this.baseUrl = localStorage.getItem('sdg_api_base_url') || DEFAULT_API_BASE_URL;
-    this.token = localStorage.getItem('sdg_admin_token') || null;
+    this._baseUrl = resolveBaseUrl();
+    this._token = localStorage.getItem('sdg_admin_token') || null;
   }
+
+  // ── URL / token helpers ──────────────────────────────────────────────────
 
   public getBaseUrl(): string {
-    return this.baseUrl;
+    return this._baseUrl;
   }
 
+  /** Override the base URL at runtime (used by the ApiConnector modal). */
   public setBaseUrl(url: string): void {
-    let cleanUrl = url.trim().replace(/\/+$/, '');
-    if (!cleanUrl.endsWith('/api') && !cleanUrl.includes('/api/')) {
-      cleanUrl = `${cleanUrl}/api`;
-    }
-    this.baseUrl = cleanUrl;
-    localStorage.setItem('sdg_api_base_url', cleanUrl);
+    const clean = url.trim().replace(/\/+$/, '');
+    this._baseUrl = clean;
+    localStorage.setItem('sdg_api_base_url', clean);
   }
 
   public getToken(): string | null {
-    return this.token;
+    return this._token;
   }
 
   public setToken(token: string | null): void {
-    this.token = token;
+    this._token = token;
     if (token) {
       localStorage.setItem('sdg_admin_token', token);
     } else {
@@ -63,62 +171,72 @@ class ApiService {
     }
   }
 
+  // ── Core HTTP helper ─────────────────────────────────────────────────────
+
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    const url = `${this._baseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
     };
-
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+    if (this._token) {
+      headers['Authorization'] = `Bearer ${this._token}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    const response = await fetch(url, { ...options, headers });
 
     if (!response.ok) {
       let errorMessage = `API Error ${response.status}: ${response.statusText}`;
       try {
         const errorJson = await response.json();
         if (errorJson.detail) {
-          errorMessage = typeof errorJson.detail === 'string' ? errorJson.detail : JSON.stringify(errorJson.detail);
+          errorMessage =
+            typeof errorJson.detail === 'string'
+              ? errorJson.detail
+              : JSON.stringify(errorJson.detail);
         }
       } catch {
-        // use default error message
+        // use default message
       }
       throw new Error(errorMessage);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
-  // ──────────────────────────────────────────
-  // PUBLIC ENDPOINTS
-  // ──────────────────────────────────────────
+  // ── PUBLIC ENDPOINTS ─────────────────────────────────────────────────────
 
-  /** Health check */
+  /** Health check — tries root /health first, then /api/health. */
   public async checkHealth(): Promise<HealthCheckResponse> {
-    const rootHealthUrl = this.baseUrl.replace(/\/api$/, '') + '/health';
+    const rootUrl = this._baseUrl.replace(/\/api$/, '') + '/health';
     try {
-      const res = await fetch(rootHealthUrl, { signal: AbortSignal.timeout(3000) });
+      const res = await fetch(rootUrl, { signal: AbortSignal.timeout(3000) });
       if (res.ok) return res.json();
     } catch {
-      // try /api/health fallback
+      // fall through
     }
     return this.request<HealthCheckResponse>('/health');
   }
 
-  /** Get active questionnaire questions */
-  public async getQuestions(): Promise<any[]> {
-    return this.request<any[]>('/questions');
+  /**
+   * GET /api/questions
+   * Returns active questions with their answer options.
+   * Scoring weights and hidden categories are NOT included.
+   */
+  public async getQuestions(): Promise<BackendQuestion[]> {
+    return this.request<BackendQuestion[]>('/questions');
   }
 
-  /** Register a participant session */
-  public async registerParticipant(data: { fullName: string; email: string; studyYear: string }) {
-    return this.request<any>('/participants', {
+  /**
+   * POST /api/participants
+   * Register a participant session before submitting the questionnaire.
+   */
+  public async registerParticipant(data: {
+    fullName: string;
+    email: string;
+    studyYear: string;
+  }): Promise<BackendParticipant> {
+    return this.request<BackendParticipant>('/participants', {
       method: 'POST',
       body: JSON.stringify({
         full_name: data.fullName,
@@ -128,28 +246,36 @@ class ApiService {
     });
   }
 
-  /** Submit sorting responses */
-  public async submitSorting(participantId: string, responses: { question_id: string; answer_id: string }[]) {
-    return this.request<any>('/sort', {
+  /**
+   * POST /api/sort
+   * Submit questionnaire responses. The backend executes the weighted scoring
+   * and returns the assigned department.
+   */
+  public async submitSorting(
+    participantId: string,
+    responses: { question_id: string; answer_id: string }[]
+  ): Promise<BackendSortResult> {
+    return this.request<BackendSortResult>('/sort', {
       method: 'POST',
-      body: JSON.stringify({
-        participant_id: participantId,
-        responses,
-      }),
+      body: JSON.stringify({ participant_id: participantId, responses }),
     });
   }
 
-  // ──────────────────────────────────────────
-  // ADMIN AUTHENTICATION
-  // ──────────────────────────────────────────
+  /**
+   * GET /api/results/{result_id}
+   * Retrieve a completed sorting result by its UUID.
+   */
+  public async getResult(resultId: string): Promise<BackendSortResult> {
+    return this.request<BackendSortResult>(`/results/${resultId}`);
+  }
 
-  /** Admin Login */
+  // ── ADMIN AUTHENTICATION ─────────────────────────────────────────────────
+
   public async adminLogin(email: string, password: string): Promise<AdminLoginResponse> {
     const res = await this.request<AdminLoginResponse>('/admin/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
-
     if (res.access_token) {
       this.setToken(res.access_token);
       localStorage.setItem('sdg_admin_name', res.admin_name);
@@ -158,7 +284,6 @@ class ApiService {
     return res;
   }
 
-  /** Admin Logout */
   public async adminLogout(): Promise<void> {
     try {
       await this.request('/admin/logout', { method: 'POST' });
@@ -171,38 +296,39 @@ class ApiService {
     }
   }
 
-  /** Get current authenticated admin profile */
   public async getAdminMe(): Promise<any> {
     return this.request<any>('/admin/me');
   }
 
-  // ──────────────────────────────────────────
-  // ADMIN MANAGEMENT API VIEWS
-  // ──────────────────────────────────────────
+  // ── ADMIN MANAGEMENT ─────────────────────────────────────────────────────
 
-  /** Get Admin Statistics */
+  /** GET /api/admin/statistics */
   public async getAdminStatistics(): Promise<BackendAdminStats> {
     return this.request<BackendAdminStats>('/admin/statistics');
   }
 
-  /** Get Admin Participants */
-  public async getAdminParticipants(limit = 50, skip = 0, statusFilter?: string): Promise<any[]> {
+  /** GET /api/admin/participants */
+  public async getAdminParticipants(
+    limit = 50,
+    skip = 0,
+    statusFilter?: string
+  ): Promise<BackendAdminParticipant[]> {
     let url = `/admin/participants?limit=${limit}&skip=${skip}`;
     if (statusFilter) url += `&status=${statusFilter}`;
-    return this.request<any[]>(url);
+    return this.request<BackendAdminParticipant[]>(url);
   }
 
-  /** Get Admin Sorting Results */
-  public async getAdminResults(limit = 50, skip = 0): Promise<any[]> {
-    return this.request<any[]>(`/admin/results?limit=${limit}&skip=${skip}`);
+  /** GET /api/admin/results */
+  public async getAdminResults(limit = 50, skip = 0): Promise<BackendAdminResult[]> {
+    return this.request<BackendAdminResult[]>(`/admin/results?limit=${limit}&skip=${skip}`);
   }
 
-  /** Admin List Departments */
+  /** GET /api/admin/departments */
   public async getAdminDepartments(): Promise<any[]> {
     return this.request<any[]>('/admin/departments');
   }
 
-  /** Admin Create Department */
+  /** POST /api/admin/departments */
   public async createDepartment(deptData: any): Promise<any> {
     return this.request<any>('/admin/departments', {
       method: 'POST',
@@ -210,7 +336,7 @@ class ApiService {
     });
   }
 
-  /** Admin Update Department */
+  /** PUT /api/admin/departments/{id} */
   public async updateDepartment(deptId: string, deptData: any): Promise<any> {
     return this.request<any>(`/admin/departments/${deptId}`, {
       method: 'PUT',
@@ -218,12 +344,12 @@ class ApiService {
     });
   }
 
-  /** Admin List Questions */
+  /** GET /api/admin/questions */
   public async getAdminQuestions(): Promise<any[]> {
     return this.request<any[]>('/admin/questions');
   }
 
-  /** Admin Create Question */
+  /** POST /api/admin/questions */
   public async createQuestion(qData: any): Promise<any> {
     return this.request<any>('/admin/questions', {
       method: 'POST',
@@ -231,7 +357,7 @@ class ApiService {
     });
   }
 
-  /** Admin Update Question */
+  /** PUT /api/admin/questions/{id} */
   public async updateQuestion(questionId: string, qData: any): Promise<any> {
     return this.request<any>(`/admin/questions/${questionId}`, {
       method: 'PUT',
@@ -239,7 +365,7 @@ class ApiService {
     });
   }
 
-  /** Admin Create Answer */
+  /** POST /api/admin/answers */
   public async createAnswer(ansData: any): Promise<any> {
     return this.request<any>('/admin/answers', {
       method: 'POST',
@@ -247,7 +373,7 @@ class ApiService {
     });
   }
 
-  /** Admin Update Answer */
+  /** PUT /api/admin/answers/{id} */
   public async updateAnswer(answerId: string, ansData: any): Promise<any> {
     return this.request<any>(`/admin/answers/${answerId}`, {
       method: 'PUT',
@@ -255,12 +381,12 @@ class ApiService {
     });
   }
 
-  /** Admin List Scoring Rules */
+  /** GET /api/admin/scoring-rules */
   public async getAdminScoringRules(): Promise<any[]> {
     return this.request<any[]>('/admin/scoring-rules');
   }
 
-  /** Admin Create Scoring Rule */
+  /** POST /api/admin/scoring-rules */
   public async createScoringRule(ruleData: any): Promise<any> {
     return this.request<any>('/admin/scoring-rules', {
       method: 'POST',
@@ -268,7 +394,7 @@ class ApiService {
     });
   }
 
-  /** Admin Update Scoring Rule */
+  /** PUT /api/admin/scoring-rules/{id} */
   public async updateScoringRule(ruleId: string, ruleData: any): Promise<any> {
     return this.request<any>(`/admin/scoring-rules/${ruleId}`, {
       method: 'PUT',

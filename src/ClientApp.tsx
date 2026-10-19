@@ -1,8 +1,33 @@
-import { useState, useEffect } from 'react';
+/**
+ * ClientApp — participant-facing application.
+ *
+ * API integration points:
+ *
+ *  Screen 3 (personal_info) → handleRegister()
+ *    Calls POST /api/participants on form submit.
+ *    On success, navigates to questionnaire.
+ *    On failure, shows an inline error banner.
+ *
+ *  Screen 4 (questionnaire)
+ *    Questions rendered from backend GET /api/questions (via useSortingFlow).
+ *    Local QUESTIONS array is kept as UI-only fallback for icons / display order.
+ *    Answer selections track backend UUIDs (question_id → answer_id).
+ *
+ *  handleSubmitQuestionnaire()
+ *    Calls POST /api/sort with backend UUIDs.
+ *    On success, stores backend result and transitions to sorting_animation.
+ *    On failure, shows error and stays on questionnaire.
+ *
+ * When the backend is unreachable, backendAvailable = false and the app
+ * falls back to the local calculateSortingResult() path so the UI always works.
+ */
+
+import { useState, useCallback } from 'react';
 import { DepartmentId, ParticipantInfo, ScreenId } from './types';
 import { INITIAL_PARTICIPANTS } from './data/initialParticipants';
-import { calculateSortingResult } from './data/questions';
+import { calculateSortingResult, QUESTIONS } from './data/questions';
 import { sounds } from './utils/audio';
+import { useSortingFlow } from './hooks/useSortingFlow';
 
 // Components
 import { MagicalBackground } from './components/MagicalBackground';
@@ -11,7 +36,7 @@ import { ScreenSwitcherBar } from './components/ScreenSwitcherBar';
 import { JoinModal } from './components/JoinModal';
 import { ApiConnectorModal } from './components/ApiConnectorModal';
 
-// Client Screens (no admin)
+// Client Screens
 import { Screen1Landing } from './screens/Screen1Landing';
 import { Screen2Welcome } from './screens/Screen2Welcome';
 import { Screen3PersonalInfo } from './screens/Screen3PersonalInfo';
@@ -24,7 +49,6 @@ import { Screen10MemberProfile } from './screens/Screen10MemberProfile';
 import { Screen11EventMode } from './screens/Screen11EventMode';
 import { Screen12MobileFlow } from './screens/Screen12MobileFlow';
 
-// Client-only screen IDs (excludes admin_dashboard)
 type ClientScreenId = Exclude<ScreenId, 'admin_dashboard'>;
 
 export default function ClientApp() {
@@ -32,44 +56,48 @@ export default function ClientApp() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isApiModalOpen, setIsApiModalOpen] = useState(false);
 
-  // Participant form state
+  // ── Backend integration hook ───────────────────────────────────────────
+  const {
+    backendAvailable,
+    backendQuestions,
+    registerParticipant,
+    registrationLoading,
+    registrationError,
+    backendParticipant,
+    backendAnswers,
+    selectAnswer: selectBackendAnswer,
+    submitSorting,
+    sortingLoading,
+    sortingError,
+    departmentResult: backendDeptResult,
+    scores: backendScores,
+  } = useSortingFlow();
+
+  // ── Local UI state (form + answers + result) ───────────────────────────
   const [participant, setParticipant] = useState<ParticipantInfo>({
-    id: 'part_current',
-    fullName: 'Brahim Mihoubi',
-    email: 'brahim.m@univ-setif.dz',
+    id: '',
+    fullName: '',
+    email: '',
     faculty: 'Computer Science Department',
     studyYear: 'Master 1',
-    createdAt: 'Just now',
-    department: 'development',
-    status: 'Completed',
+    createdAt: '',
+    status: 'In Progress',
   });
 
-  // Questionnaire answers state: questionId -> optionId
-  const [answers, setAnswers] = useState<Record<number, string>>({
-    1: 'q1_o1',
-    2: 'q2_o1',
-    3: 'q3_o1',
-    4: 'q4_o1',
-    5: 'q5_o1',
-    6: 'q6_o1',
-    7: 'q7_o1',
-    8: 'q8_o1',
-  });
+  // Local answers: questionIndex(0-based) → local optionId (e.g. 'q1_o1')
+  // Used for UI rendering; backend answers are tracked separately.
+  const [localAnswers, setLocalAnswers] = useState<Record<number, string>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  // Sorting results
+  // Final results (either from backend or local fallback)
   const [departmentResult, setDepartmentResult] = useState<DepartmentId>('development');
   const [scores, setScores] = useState<Record<DepartmentId, number>>({
-    development: 87,
-    design: 26,
-    events: 22,
-    social_media: 14,
+    development: 0, design: 0, events: 0, social_media: 0,
   });
 
-  // Selected department for Screen 8 detail view
   const [selectedDeptDetail, setSelectedDeptDetail] = useState<DepartmentId>('development');
 
-  // Participants list (shared with admin via localStorage)
+  // Participants list (still used by JoinModal / EventMode)
   const [participantsList, setParticipantsList] = useState<ParticipantInfo[]>(() => {
     try {
       const saved = localStorage.getItem('sdg_participants');
@@ -79,36 +107,133 @@ export default function ClientApp() {
     }
   });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('sdg_participants', JSON.stringify(participantsList));
-    } catch {
-      // ignore
-    }
-  }, [participantsList]);
+  // API submit error shown in UI
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Navigation handler — intercept admin_dashboard and redirect to /admin
+  // ── Navigation ─────────────────────────────────────────────────────────
   const handleNavigate = (screen: ScreenId) => {
-    if (screen === 'admin_dashboard') {
-      window.location.href = '/admin';
-      return;
-    }
+    if (screen === 'admin_dashboard') { window.location.href = '/admin'; return; }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setCurrentScreen(screen as ClientScreenId);
   };
 
-  // Handlers
   const handleUpdateParticipant = (data: Partial<ParticipantInfo>) => {
     setParticipant((prev) => ({ ...prev, ...data }));
   };
 
-  const handleSelectOption = (questionId: number, optionId: string) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionId }));
-  };
+  // ── Screen 3 → Register with backend, then navigate to questionnaire ───
+  const handlePersonalInfoNext = useCallback(async () => {
+    sounds.playClick();
+    setSubmitError(null);
 
-  const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prev) => Math.min(prev + 1, 7));
-  };
+    if (backendAvailable) {
+      const bp = await registerParticipant({
+        fullName: participant.fullName,
+        email: participant.email,
+        studyYear: participant.studyYear,
+      });
+      if (!bp) {
+        // registrationError is set inside useSortingFlow; show it
+        return; // stay on Screen 3
+      }
+      // Update local participant id from backend
+      setParticipant((prev) => ({ ...prev, id: bp.id, createdAt: bp.created_at }));
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentScreen('questionnaire');
+  }, [backendAvailable, participant, registerParticipant]);
+
+  // ── Screen 4 → answer selection ───────────────────────────────────────
+  const handleSelectOption = useCallback(
+    (questionIndex: number, localOptionId: string) => {
+      // Track local option for UI rendering
+      setLocalAnswers((prev) => ({ ...prev, [questionIndex]: localOptionId }));
+
+      // Also track backend UUID if backend questions are loaded
+      if (backendAvailable && backendQuestions.length > 0) {
+        const backendQ = backendQuestions[questionIndex];
+        if (backendQ) {
+          // Map local option position to backend answer by display_order
+          const localQ = QUESTIONS[questionIndex];
+          const localOptIndex = localQ?.options.findIndex((o) => o.id === localOptionId) ?? -1;
+          const sortedAnswers = [...backendQ.answers].sort(
+            (a, b) => a.display_order - b.display_order
+          );
+          const backendAns = sortedAnswers[localOptIndex];
+          if (backendAns) {
+            selectBackendAnswer(backendQ.id, backendAns.id);
+          }
+        }
+      }
+    },
+    [backendAvailable, backendQuestions, selectBackendAnswer]
+  );
+
+  // ── Screen 4 → submit questionnaire ───────────────────────────────────
+  const handleSubmitQuestionnaire = useCallback(async () => {
+    setSubmitError(null);
+
+    if (backendAvailable && backendParticipant) {
+      // Backend path
+      const result = await submitSorting();
+      if (!result) {
+        setSubmitError(sortingError ?? 'Sorting submission failed. Please try again.');
+        return;
+      }
+      // Apply backend result
+      const deptSlug = result.department.slug as DepartmentId;
+      setDepartmentResult(deptSlug);
+      setScores({
+        development: result.scores.development ?? 0,
+        design: result.scores.design ?? 0,
+        events: result.scores.events ?? 0,
+        social_media: result.scores.social_media ?? 0,
+      });
+      setParticipant((prev) => ({
+        ...prev,
+        department: deptSlug,
+        scores: {
+          development: result.scores.development ?? 0,
+          design: result.scores.design ?? 0,
+          events: result.scores.events ?? 0,
+          social_media: result.scores.social_media ?? 0,
+        },
+        status: 'Completed',
+      }));
+    } else {
+      // Local fallback — backend offline or participant not registered yet
+      const calc = calculateSortingResult(localAnswers);
+      setDepartmentResult(calc.departmentId);
+      setScores(calc.scores);
+      setParticipant((prev) => ({
+        ...prev,
+        department: calc.departmentId,
+        scores: calc.scores,
+        status: 'Completed',
+      }));
+    }
+
+    // Add to local participants list
+    setParticipantsList((prev) => {
+      const updated: ParticipantInfo = {
+        ...participant,
+        id: participant.id || `local_${Date.now()}`,
+        createdAt: participant.createdAt || 'Just now',
+      };
+      return [updated, ...prev.filter((p) => p.email !== updated.email)];
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentScreen('sorting_animation');
+  }, [
+    backendAvailable, backendParticipant, submitSorting,
+    sortingError, localAnswers, participant,
+  ]);
+
+  const handleSortingAnimationComplete = () => setCurrentScreen('sorting_result');
+
+  const handleNextQuestion = () =>
+    setCurrentQuestionIndex((prev) => Math.min(prev + 1, QUESTIONS.length - 1));
 
   const handlePreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
@@ -118,31 +243,9 @@ export default function ClientApp() {
     }
   };
 
-  const handleSubmitQuestionnaire = () => {
-    const calc = calculateSortingResult(answers);
-    setDepartmentResult(calc.departmentId);
-    setScores(calc.scores);
-
-    const updated: ParticipantInfo = {
-      ...participant,
-      id: `part_${Date.now()}`,
-      department: calc.departmentId,
-      scores: calc.scores,
-      createdAt: 'Just now',
-      status: 'Completed',
-    };
-    setParticipant(updated);
-    setParticipantsList((prev) => [updated, ...prev.filter((p) => p.email !== updated.email)]);
-    setCurrentScreen('sorting_animation');
-  };
-
-  const handleSortingAnimationComplete = () => {
-    setCurrentScreen('sorting_result');
-  };
-
   const handleJoinModalSuccess = (data: { name: string; email: string; dept: DepartmentId }) => {
     const newEntry: ParticipantInfo = {
-      id: `part_${Date.now()}`,
+      id: `local_${Date.now()}`,
       fullName: data.name,
       email: data.email,
       faculty: 'Computer Science Department',
@@ -155,6 +258,7 @@ export default function ClientApp() {
     setParticipantsList((prev) => [newEntry, ...prev]);
   };
 
+  // ── Render ─────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#08090d] text-[#e2d9c8] flex flex-col relative selection:bg-amber-600/30 selection:text-amber-200">
       <MagicalBackground />
@@ -169,59 +273,65 @@ export default function ClientApp() {
       <main className="relative z-10 flex-1 flex flex-col">
         {currentScreen === 'landing' && (
           <Screen1Landing
-            onStartJourney={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('welcome');
-            }}
-            onExploreDepartments={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('departments_overview');
-            }}
+            onStartJourney={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('welcome'); }}
+            onExploreDepartments={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('departments_overview'); }}
             onNavigate={handleNavigate}
           />
         )}
 
         {currentScreen === 'welcome' && (
           <Screen2Welcome
-            onNext={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('personal_info');
-            }}
+            onNext={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('personal_info'); }}
             onNavigate={handleNavigate}
           />
         )}
 
         {currentScreen === 'personal_info' && (
-          <Screen3PersonalInfo
-            participant={participant}
-            onUpdateParticipant={handleUpdateParticipant}
-            onNext={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('questionnaire');
-            }}
-            onPrevious={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('welcome');
-            }}
-            onNavigate={handleNavigate}
-          />
+          <>
+            {/* Inline error banner for registration failure */}
+            {(registrationError || submitError) && (
+              <div className="max-w-xl mx-auto mt-4 px-4">
+                <div className="bg-rose-950/60 border border-rose-500/40 text-rose-300 text-sm rounded-xl px-4 py-3">
+                  ⚠ {registrationError || submitError}
+                </div>
+              </div>
+            )}
+            <Screen3PersonalInfo
+              participant={participant}
+              onUpdateParticipant={handleUpdateParticipant}
+              onNext={handlePersonalInfoNext}
+              onPrevious={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('welcome'); }}
+              onNavigate={handleNavigate}
+              isLoading={registrationLoading}
+            />
+          </>
         )}
 
         {currentScreen === 'questionnaire' && (
-          <Screen4Questionnaire
-            currentQuestionIndex={currentQuestionIndex}
-            answers={answers}
-            onSelectOption={handleSelectOption}
-            onNextQuestion={handleNextQuestion}
-            onPreviousQuestion={handlePreviousQuestion}
-            onSubmitQuestionnaire={handleSubmitQuestionnaire}
-            onNavigate={handleNavigate}
-          />
+          <>
+            {(submitError || sortingError) && (
+              <div className="max-w-xl mx-auto mt-4 px-4">
+                <div className="bg-rose-950/60 border border-rose-500/40 text-rose-300 text-sm rounded-xl px-4 py-3">
+                  ⚠ {submitError || sortingError}
+                </div>
+              </div>
+            )}
+            <Screen4Questionnaire
+              currentQuestionIndex={currentQuestionIndex}
+              answers={localAnswers}
+              onSelectOption={handleSelectOption}
+              onNextQuestion={handleNextQuestion}
+              onPreviousQuestion={handlePreviousQuestion}
+              onSubmitQuestionnaire={handleSubmitQuestionnaire}
+              onNavigate={handleNavigate}
+              isSubmitting={sortingLoading}
+            />
+          </>
         )}
 
         {currentScreen === 'sorting_animation' && (
           <Screen5SortingAnimation
-            answers={answers}
+            answers={localAnswers}
             scores={scores}
             departmentResult={departmentResult}
             onComplete={handleSortingAnimationComplete}
@@ -233,29 +343,16 @@ export default function ClientApp() {
           <Screen6SortingResult
             departmentId={departmentResult}
             scores={scores}
-            onExploreDepartments={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('departments_overview');
-            }}
-            onGoToProfile={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('member_profile');
-            }}
+            onExploreDepartments={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('departments_overview'); }}
+            onGoToProfile={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('member_profile'); }}
             onNavigate={handleNavigate}
           />
         )}
 
         {currentScreen === 'departments_overview' && (
           <Screen7DepartmentsOverview
-            onSelectDepartment={(deptId) => {
-              setSelectedDeptDetail(deptId);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('department_detail');
-            }}
-            onTakeTest={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('welcome');
-            }}
+            onSelectDepartment={(deptId) => { setSelectedDeptDetail(deptId); window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('department_detail'); }}
+            onTakeTest={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('welcome'); }}
             onNavigate={handleNavigate}
           />
         )}
@@ -263,28 +360,19 @@ export default function ClientApp() {
         {currentScreen === 'department_detail' && (
           <Screen8DepartmentDetail
             departmentId={selectedDeptDetail}
-            onBack={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('departments_overview');
-            }}
+            onBack={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('departments_overview'); }}
             onApply={() => setIsJoinModalOpen(true)}
             onNavigate={handleNavigate}
           />
         )}
 
         {currentScreen === 'member_profile' && (
-          <Screen10MemberProfile
-            participant={participant}
-            onNavigate={handleNavigate}
-          />
+          <Screen10MemberProfile participant={participant} onNavigate={handleNavigate} />
         )}
 
         {currentScreen === 'event_mode' && (
           <Screen11EventMode
-            onStartTest={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setCurrentScreen('welcome');
-            }}
+            onStartTest={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setCurrentScreen('welcome'); }}
             onNavigate={handleNavigate}
           />
         )}
@@ -297,10 +385,7 @@ export default function ClientApp() {
       <ScreenSwitcherBar
         currentScreen={currentScreen}
         onSelectScreen={(screen) => {
-          if (screen === 'admin_dashboard') {
-            window.location.href = '/admin';
-            return;
-          }
+          if (screen === 'admin_dashboard') { window.location.href = '/admin'; return; }
           window.scrollTo({ top: 0, behavior: 'smooth' });
           setCurrentScreen(screen as ClientScreenId);
         }}
@@ -312,10 +397,7 @@ export default function ClientApp() {
         onSuccess={handleJoinModalSuccess}
       />
 
-      <ApiConnectorModal
-        isOpen={isApiModalOpen}
-        onClose={() => setIsApiModalOpen(false)}
-      />
+      <ApiConnectorModal isOpen={isApiModalOpen} onClose={() => setIsApiModalOpen(false)} />
     </div>
   );
 }

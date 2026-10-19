@@ -11,6 +11,8 @@ interface Screen3PersonalInfoProps {
   onNext: () => void;
   onPrevious: () => void;
   onNavigate: (screen: ScreenId) => void;
+  /** When true, disables the Next button and shows a loading spinner */
+  isLoading?: boolean;
 }
 
 export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
@@ -19,6 +21,7 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
   onNext,
   onPrevious,
   onNavigate,
+  isLoading = false,
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -45,6 +48,7 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     const newErrors: Record<string, string> = {};
 
     if (!participant.fullName.trim()) {
@@ -196,10 +200,25 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
 
                 <button
                   type="submit"
-                  className="btn-notch-parchment px-8 py-2.5 text-xs sm:text-sm flex items-center gap-2"
+                  disabled={isLoading}
+                  className={`btn-notch-parchment px-8 py-2.5 text-xs sm:text-sm flex items-center gap-2 ${
+                    isLoading ? 'opacity-60 cursor-not-allowed' : ''
+                  }`}
                 >
-                  <span>Next</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      <span>Registering…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Next</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>

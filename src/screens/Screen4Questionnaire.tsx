@@ -111,6 +111,8 @@ interface Screen4QuestionnaireProps {
   onPreviousQuestion: () => void;
   onSubmitQuestionnaire: () => void;
   onNavigate: (screen: ScreenId) => void;
+  /** When true, disables the Submit button and shows a loading spinner */
+  isSubmitting?: boolean;
 }
 
 export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
@@ -121,6 +123,7 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
   onPreviousQuestion,
   onSubmitQuestionnaire,
   onNavigate,
+  isSubmitting = false,
 }) => {
   const currentQuestion = QUESTIONS[currentQuestionIndex] || QUESTIONS[0];
   const totalQuestions = QUESTIONS.length;
@@ -264,14 +267,26 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
 
               <button
                 type="button"
-                disabled={!selectedOptionId}
+                disabled={!selectedOptionId || isSubmitting}
                 onClick={handleNext}
                 className={`btn-notch-primary px-7 py-2.5 text-xs sm:text-sm flex items-center gap-2 ${
-                  !selectedOptionId ? 'opacity-40 cursor-not-allowed' : ''
+                  !selectedOptionId || isSubmitting ? 'opacity-40 cursor-not-allowed' : ''
                 }`}
               >
-                <span>{isLastQuestion ? 'Submit to Sorting Hat' : 'Next'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                {isSubmitting && isLastQuestion ? (
+                  <>
+                    <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    <span>Sorting…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{isLastQuestion ? 'Submit to Sorting Hat' : 'Next'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </>
+                )}
               </button>
             </div>
           </div>
