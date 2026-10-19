@@ -1,6 +1,6 @@
 import { useState, FC } from "react";
 import { ScreenId } from "../types";
-import { ASSETS } from "../../public/assets";
+import { ASSETS } from "../config/assets";
 import { sounds } from "../utils/audio";
 import { Volume2, VolumeX, Music, MonitorPlay } from "lucide-react";
 

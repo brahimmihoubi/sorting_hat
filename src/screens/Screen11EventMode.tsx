@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { ScreenId } from "../types";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../../public/assets";
+import { ASSETS } from "../config/assets";
 import {
   Maximize2,
   Minimize2,

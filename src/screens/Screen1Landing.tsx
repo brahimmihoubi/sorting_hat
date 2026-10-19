@@ -1,7 +1,6 @@
 import type { FC } from "react";
 import { ScreenId } from "../types";
-import { sounds } from "../utils/audio";
-import { ASSETS } from "../../public/assets";
+import { ASSETS } from "../config/assets";
 import { DEPARTMENTS } from "../data/departments";
 import { GoldenHatButton } from "../components/GoldenHatButton";
 import { DepartmentHeraldicCard } from "../components/DepartmentHeraldicCard";
@@ -81,14 +80,23 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
             {/* Center Stage Presentation Container */}
             <div className="relative w-full max-w-lg aspect-square sm:aspect-4/3 rounded-2xl overflow-hidden border border-amber-500/30 shadow-[0_20px_50px_rgba(0,0,0,0.8)] group">
               <video
-                src={ASSETS.heroVideo}
                 poster={ASSETS.heroHall}
                 autoPlay
                 loop
                 muted
                 playsInline
+                preload="metadata"
+                aria-label="SDG Sorting Hat — Welcome Day highlight reel"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
+              >
+                <source src={ASSETS.heroVideo} type="video/mp4" />
+                {/* Fallback for browsers that don't support video */}
+                <img
+                  src={ASSETS.heroHall}
+                  alt="SDG Sorting Hat in the Grand Hall"
+                  className="w-full h-full object-cover"
+                />
+              </video>
               <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-transparent to-transparent opacity-80" />
 
               {/* Floating Department Crest Badges Overlay */}

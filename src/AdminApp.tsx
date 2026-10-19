@@ -13,7 +13,7 @@ import {
   ScoringRulesApiView,
 } from "./screens/AdminApiManagementViews";
 import { ApiConnectorModal } from "./components/ApiConnectorModal";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "./config/assets";
 import {
   LayoutDashboard,
   Users,

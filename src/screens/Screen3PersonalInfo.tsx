@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { ParticipantInfo, ScreenId } from "../types";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../../public/assets";
+import { ASSETS } from "../config/assets";
 import { WizardStepper } from "../components/WizardStepper";
 import {
   User,

@@ -1,4 +1,4 @@
-import { ASSETS } from "../../public/assets";
+import { ASSETS } from "../config/assets";
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
