@@ -1,6 +1,6 @@
-import { FC } from 'react';
-import { ASSETS } from '../assets';
-import { sounds } from '../utils/audio';
+import { FC } from "react";
+import { ASSETS } from "../public/assets";
+import { sounds } from "../utils/audio";
 
 interface GoldenHatButtonProps {
   text?: string;
@@ -10,9 +10,9 @@ interface GoldenHatButtonProps {
 }
 
 export const GoldenHatButton: FC<GoldenHatButtonProps> = ({
-  text = 'Take the Sorting Hat Test',
+  text = "Take the Sorting Hat Test",
   onClick,
-  className = '',
+  className = "",
   showArrow = true,
 }) => {
   const handleClick = () => {

@@ -1,7 +1,7 @@
-import { useState, FC } from 'react';
-import { apiService } from '../services/api';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
+import { useState, FC } from "react";
+import { apiService } from "../services/api";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
 import {
   ShieldCheck,
   KeyRound,
@@ -12,15 +12,17 @@ import {
   Sparkles,
   AlertCircle,
   CheckCircle2,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface AdminLoginScreenProps {
   onLoginSuccess: (adminName: string, adminEmail: string) => void;
 }
 
-export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('algeria.data@gmail.com');
-  const [password, setPassword] = useState('SDG_welcome_2027');
+export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({
+  onLoginSuccess,
+}) => {
+  const [email, setEmail] = useState("algeria.data@gmail.com");
+  const [password, setPassword] = useState("SDG_welcome_2027");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +38,9 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) 
       onLoginSuccess(res.admin_name, res.admin_email);
     } catch (err: any) {
       sounds.playClick();
-      setError(err.message || 'Login failed. Please verify admin email & password.');
+      setError(
+        err.message || "Login failed. Please verify admin email & password.",
+      );
     } finally {
       setLoading(false);
     }
@@ -44,8 +48,8 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) 
 
   const fillDefaultCredentials = () => {
     sounds.playClick();
-    setEmail('algeria.data@gmail.com');
-    setPassword('SDG_welcome_2027');
+    setEmail("algeria.data@gmail.com");
+    setPassword("SDG_welcome_2027");
   };
 
   return (
@@ -58,7 +62,11 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) 
         {/* Brand Lockup */}
         <div className="flex flex-col items-center text-center space-y-3 pb-6 border-b border-amber-900/30">
           <div className="relative w-16 h-16 flex items-center justify-center p-2 rounded-2xl bg-gradient-to-b from-[#fde68a] via-[#f5b027] to-[#d97706] border-2 border-[#ffe899] shadow-[0_0_25px_rgba(245,175,40,0.6)] animate-pulse">
-            <img src={ASSETS.logo} alt="SDG" className="w-full h-full object-contain filter drop-shadow-md" />
+            <img
+              src={ASSETS.logo}
+              alt="SDG"
+              className="w-full h-full object-contain filter drop-shadow-md"
+            />
           </div>
 
           <div>
@@ -66,7 +74,8 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) 
               SDG Admin Portal
             </h1>
             <p className="text-xs text-amber-300/60 mt-1 font-sans">
-              Authenticate to access live sorting hat supervision & backend APIs.
+              Authenticate to access live sorting hat supervision & backend
+              APIs.
             </p>
           </div>
 
@@ -134,10 +143,22 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) 
           <div className="p-3 rounded-xl bg-slate-950/60 border border-amber-900/30 text-[11px] text-amber-200/60 font-mono space-y-1">
             <div className="flex items-center justify-between text-amber-300 font-semibold">
               <span>Required Credentials:</span>
-              <span className="text-emerald-400 font-normal">Active Backend</span>
+              <span className="text-emerald-400 font-normal">
+                Active Backend
+              </span>
             </div>
-            <div>Email: <span className="text-amber-100 font-semibold">algeria.data@gmail.com</span></div>
-            <div>Password: <span className="text-amber-100 font-semibold">SDG_welcome_2027</span></div>
+            <div>
+              Email:{" "}
+              <span className="text-amber-100 font-semibold">
+                algeria.data@gmail.com
+              </span>
+            </div>
+            <div>
+              Password:{" "}
+              <span className="text-amber-100 font-semibold">
+                SDG_welcome_2027
+              </span>
+            </div>
           </div>
 
           {/* Submit CTA */}
@@ -147,7 +168,11 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({ onLoginSuccess }) 
             className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-bold text-sm tracking-wide shadow-[0_0_25px_rgba(245,158,11,0.4)] border border-amber-300/40 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-98"
           >
             <KeyRound className="w-4 h-4 text-slate-950" />
-            <span>{loading ? 'Authenticating with Backend...' : 'Sign In to Dashboard'}</span>
+            <span>
+              {loading
+                ? "Authenticating with Backend..."
+                : "Sign In to Dashboard"}
+            </span>
             <ArrowRight className="w-4 h-4 text-slate-950" />
           </button>
         </form>

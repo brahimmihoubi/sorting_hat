@@ -1,9 +1,16 @@
-import { FC, useState } from 'react';
-import { ParticipantInfo, ScreenId } from '../types';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
-import { WizardStepper } from '../components/WizardStepper';
-import { User, Mail, Building2, GraduationCap, ArrowRight, ArrowLeft } from 'lucide-react';
+import { FC, useState } from "react";
+import { ParticipantInfo, ScreenId } from "../types";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
+import { WizardStepper } from "../components/WizardStepper";
+import {
+  User,
+  Mail,
+  Building2,
+  GraduationCap,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 
 interface Screen3PersonalInfoProps {
   participant: ParticipantInfo;
@@ -26,24 +33,24 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const faculties = [
-    'Computer Science Department',
-    'Mathematics & Informatics',
-    'Technology / Engineering',
-    'Electronics & Telecommunications',
-    'Natural & Life Sciences',
-    'Economics & Management',
-    'Medicine & Health Sciences',
-    'Other Faculty',
+    "Computer Science Department",
+    "Mathematics & Informatics",
+    "Technology / Engineering",
+    "Electronics & Telecommunications",
+    "Natural & Life Sciences",
+    "Economics & Management",
+    "Medicine & Health Sciences",
+    "Other Faculty",
   ];
 
   const studyYears = [
-    'Licence 1',
-    'Licence 2',
-    'Licence 3',
-    'Master 1',
-    'Master 2',
-    'Doctorate',
-    'Alumni / Self-Taught',
+    "Licence 1",
+    "Licence 2",
+    "Licence 3",
+    "Master 1",
+    "Master 2",
+    "Doctorate",
+    "Alumni / Self-Taught",
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -52,10 +59,10 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!participant.fullName.trim()) {
-      newErrors.fullName = 'Please enter your full name.';
+      newErrors.fullName = "Please enter your full name.";
     }
-    if (!participant.email.trim() || !participant.email.includes('@')) {
-      newErrors.email = 'Please provide a valid university email address.';
+    if (!participant.email.trim() || !participant.email.includes("@")) {
+      newErrors.email = "Please provide a valid university email address.";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -88,12 +95,16 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
               </h2>
               <div className="w-16 h-0.5 bg-amber-800/40 mx-auto" />
               <p className="text-sm sm:text-base text-amber-900/80 max-w-xl mx-auto font-sans leading-relaxed">
-                This information helps us personalize your experience and understand your background better.
+                This information helps us personalize your experience and
+                understand your background better.
               </p>
             </div>
 
             {/* Form Fields */}
-            <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="max-w-xl mx-auto space-y-5"
+            >
               {/* Full Name */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-amber-950 mb-1.5">
@@ -106,13 +117,17 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
                   <input
                     type="text"
                     value={participant.fullName}
-                    onChange={(e) => onUpdateParticipant({ fullName: e.target.value })}
+                    onChange={(e) =>
+                      onUpdateParticipant({ fullName: e.target.value })
+                    }
                     placeholder="Enter your full name"
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-amber-100/70 border border-amber-900/30 text-amber-950 placeholder-amber-900/40 focus:outline-none focus:ring-2 focus:ring-amber-700/50 text-sm font-medium transition-all"
                   />
                 </div>
                 {errors.fullName && (
-                  <p className="text-xs text-rose-700 font-semibold mt-1">{errors.fullName}</p>
+                  <p className="text-xs text-rose-700 font-semibold mt-1">
+                    {errors.fullName}
+                  </p>
                 )}
               </div>
 
@@ -128,13 +143,17 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
                   <input
                     type="email"
                     value={participant.email}
-                    onChange={(e) => onUpdateParticipant({ email: e.target.value })}
+                    onChange={(e) =>
+                      onUpdateParticipant({ email: e.target.value })
+                    }
                     placeholder="example@univ-setif.dz"
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-amber-100/70 border border-amber-900/30 text-amber-950 placeholder-amber-900/40 focus:outline-none focus:ring-2 focus:ring-amber-700/50 text-sm font-medium transition-all"
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-xs text-rose-700 font-semibold mt-1">{errors.email}</p>
+                  <p className="text-xs text-rose-700 font-semibold mt-1">
+                    {errors.email}
+                  </p>
                 )}
               </div>
 
@@ -149,7 +168,9 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
                   </div>
                   <select
                     value={participant.faculty}
-                    onChange={(e) => onUpdateParticipant({ faculty: e.target.value })}
+                    onChange={(e) =>
+                      onUpdateParticipant({ faculty: e.target.value })
+                    }
                     className="w-full pl-10 pr-10 py-3 rounded-xl bg-amber-100/70 border border-amber-900/30 text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-700/50 text-sm font-medium transition-all appearance-none cursor-pointer"
                   >
                     {faculties.map((f) => (
@@ -172,7 +193,9 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
                   </div>
                   <select
                     value={participant.studyYear}
-                    onChange={(e) => onUpdateParticipant({ studyYear: e.target.value })}
+                    onChange={(e) =>
+                      onUpdateParticipant({ studyYear: e.target.value })
+                    }
                     className="w-full pl-10 pr-10 py-3 rounded-xl bg-amber-100/70 border border-amber-900/30 text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-700/50 text-sm font-medium transition-all appearance-none cursor-pointer"
                   >
                     {studyYears.map((y) => (
@@ -202,14 +225,29 @@ export const Screen3PersonalInfo: FC<Screen3PersonalInfoProps> = ({
                   type="submit"
                   disabled={isLoading}
                   className={`btn-notch-parchment px-8 py-2.5 text-xs sm:text-sm flex items-center gap-2 ${
-                    isLoading ? 'opacity-60 cursor-not-allowed' : ''
+                    isLoading ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      <svg
+                        className="animate-spin w-3.5 h-3.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8z"
+                        />
                       </svg>
                       <span>Registering…</span>
                     </>

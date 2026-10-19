@@ -1,8 +1,8 @@
-import { FC, useState } from 'react';
-import { ParticipantInfo, ScreenId } from '../types';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
-import { BackendAdminStats } from '../services/api';
+import { FC, useState } from "react";
+import { ParticipantInfo, ScreenId } from "../types";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
+import { BackendAdminStats } from "../services/api";
 import {
   Users,
   Code,
@@ -19,7 +19,7 @@ import {
   ExternalLink,
   Plus,
   RefreshCw,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Screen9AdminDashboardProps {
   participants: ParticipantInfo[];
@@ -40,39 +40,72 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
   onAddParticipant,
   onRefresh,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [showSimulateModal, setShowSimulateModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'participants' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "participants" | "settings"
+  >("dashboard");
 
   // ── Derived stats (prefer backend, fall back to local list) ───────────
   const totalParticipants = stats?.total_participants ?? participants.length;
-  const completedCount = stats?.completed_participants ?? participants.filter((p) => p.status === 'Completed').length;
-  const inProgressCount = stats?.in_progress_participants ?? participants.filter((p) => p.status !== 'Completed').length;
-  const completionRate = stats?.completion_rate_percentage
-    ?? (participants.length > 0 ? Math.round((completedCount / participants.length) * 100) : 0);
+  const completedCount =
+    stats?.completed_participants ??
+    participants.filter((p) => p.status === "Completed").length;
+  const inProgressCount =
+    stats?.in_progress_participants ??
+    participants.filter((p) => p.status !== "Completed").length;
+  const completionRate =
+    stats?.completion_rate_percentage ??
+    (participants.length > 0
+      ? Math.round((completedCount / participants.length) * 100)
+      : 0);
 
   const dist = stats?.department_distribution;
-  const devCount  = dist?.development?.count  ?? participants.filter((p) => p.department === 'development').length;
-  const desCount  = dist?.design?.count        ?? participants.filter((p) => p.department === 'design').length;
-  const evtCount  = dist?.events?.count        ?? participants.filter((p) => p.department === 'events').length;
-  const smCount   = dist?.social_media?.count  ?? participants.filter((p) => p.department === 'social_media').length;
+  const devCount =
+    dist?.development?.count ??
+    participants.filter((p) => p.department === "development").length;
+  const desCount =
+    dist?.design?.count ??
+    participants.filter((p) => p.department === "design").length;
+  const evtCount =
+    dist?.events?.count ??
+    participants.filter((p) => p.department === "events").length;
+  const smCount =
+    dist?.social_media?.count ??
+    participants.filter((p) => p.department === "social_media").length;
 
-  const devPct  = dist?.development?.percentage  ?? (totalParticipants > 0 ? Math.round((devCount / totalParticipants) * 100) : 0);
-  const desPct  = dist?.design?.percentage        ?? (totalParticipants > 0 ? Math.round((desCount / totalParticipants) * 100) : 0);
-  const evtPct  = dist?.events?.percentage        ?? (totalParticipants > 0 ? Math.round((evtCount / totalParticipants) * 100) : 0);
-  const smPct   = dist?.social_media?.percentage  ?? (totalParticipants > 0 ? Math.round((smCount / totalParticipants) * 100) : 0);
+  const devPct =
+    dist?.development?.percentage ??
+    (totalParticipants > 0
+      ? Math.round((devCount / totalParticipants) * 100)
+      : 0);
+  const desPct =
+    dist?.design?.percentage ??
+    (totalParticipants > 0
+      ? Math.round((desCount / totalParticipants) * 100)
+      : 0);
+  const evtPct =
+    dist?.events?.percentage ??
+    (totalParticipants > 0
+      ? Math.round((evtCount / totalParticipants) * 100)
+      : 0);
+  const smPct =
+    dist?.social_media?.percentage ??
+    (totalParticipants > 0
+      ? Math.round((smCount / totalParticipants) * 100)
+      : 0);
 
   // Donut: circumference ≈ 251.2 for r=40
   const CIRC = 251.2;
   const devDash = (devPct / 100) * CIRC;
   const desDash = (desPct / 100) * CIRC;
   const evtDash = (evtPct / 100) * CIRC;
-  const smDash  = (smPct  / 100) * CIRC;
+  const smDash = (smPct / 100) * CIRC;
   const devOffset = 0;
-  const evtOffset = -(devDash);
+  const evtOffset = -devDash;
   const desOffset = -(devDash + evtDash);
-  const smOffset  = -(devDash + evtDash + desDash);
+  const smOffset = -(devDash + evtDash + desDash);
 
   // Gauge
   const gaugeDash = (completionRate / 100) * CIRC;
@@ -81,49 +114,56 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
     const matchesSearch =
       p.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDept = departmentFilter === 'all' || p.department === departmentFilter;
+    const matchesDept =
+      departmentFilter === "all" || p.department === departmentFilter;
     return matchesSearch && matchesDept;
   });
 
   const handleExportCSV = () => {
     sounds.playClick();
-    const headers = 'ID,Full Name,Email,Faculty,Study Year,Department,Status,Created At\n';
+    const headers =
+      "ID,Full Name,Email,Faculty,Study Year,Department,Status,Created At\n";
     const rows = participants
       .map(
         (p) =>
           `"${p.id}","${p.fullName}","${p.email}","${p.faculty}","${p.studyYear}","${
-            p.department || 'Unsorted'
-          }","${p.status || 'Completed'}","${p.createdAt}"`
+            p.department || "Unsorted"
+          }","${p.status || "Completed"}","${p.createdAt}"`,
       )
-      .join('\n');
-    const blob = new Blob([headers + rows], { type: 'text/csv' });
+      .join("\n");
+    const blob = new Blob([headers + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `sdg_sorting_hat_participants_${Date.now()}.csv`;
     a.click();
   };
 
   const handleQuickAdd = () => {
-    const names = ['Karim Mansouri', 'Lina Benseghir', 'Farid Belhadj', 'Anis Slimani'];
+    const names = [
+      "Karim Mansouri",
+      "Lina Benseghir",
+      "Farid Belhadj",
+      "Anis Slimani",
+    ];
     const randomName = names[Math.floor(Math.random() * names.length)];
-    const depts: ('development' | 'design' | 'events' | 'social_media')[] = [
-      'development',
-      'design',
-      'events',
-      'social_media',
+    const depts: ("development" | "design" | "events" | "social_media")[] = [
+      "development",
+      "design",
+      "events",
+      "social_media",
     ];
     const randomDept = depts[Math.floor(Math.random() * depts.length)];
 
     const newEntry: ParticipantInfo = {
       id: `part_${Date.now()}`,
       fullName: `${randomName} (${Math.floor(Math.random() * 90 + 10)})`,
-      email: `${randomName.toLowerCase().replace(' ', '.')}@univ-setif.dz`,
-      faculty: 'Computer Science Department',
-      studyYear: 'Master 1',
-      createdAt: 'Just now',
+      email: `${randomName.toLowerCase().replace(" ", ".")}@univ-setif.dz`,
+      faculty: "Computer Science Department",
+      studyYear: "Master 1",
+      createdAt: "Just now",
       department: randomDept,
-      status: 'Completed',
+      status: "Completed",
       scores: { development: 65, design: 50, events: 45, social_media: 40 },
     };
 
@@ -140,7 +180,8 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             Admin Dashboard
           </h1>
           <p className="text-xs sm:text-sm text-amber-200/60 mt-0.5">
-            Manage participants, view statistics and supervise the sorting process.
+            Manage participants, view statistics and supervise the sorting
+            process.
           </p>
         </div>
 
@@ -165,7 +206,9 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
               <div className="text-xs font-bold text-amber-100 leading-tight">
                 Brahim Mihoubi
               </div>
-              <div className="text-[10px] text-amber-400/60 font-mono">Administrator</div>
+              <div className="text-[10px] text-amber-400/60 font-mono">
+                Administrator
+              </div>
             </div>
           </div>
         </div>
@@ -176,81 +219,134 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
         {/* Total Participants */}
         <div className="p-4 rounded-xl bg-slate-900/80 border border-amber-500/40 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-amber-200/70">Total Participants</span>
+            <span className="text-[11px] font-medium text-amber-200/70">
+              Total Participants
+            </span>
             <div className="flex items-center gap-1.5">
               {onRefresh && (
-                <button onClick={() => { sounds.playClick(); onRefresh(); }} title="Refresh" className="text-amber-400/60 hover:text-amber-300 transition-colors">
-                  <RefreshCw className={`w-3 h-3 ${statsLoading ? 'animate-spin' : ''}`} />
+                <button
+                  onClick={() => {
+                    sounds.playClick();
+                    onRefresh();
+                  }}
+                  title="Refresh"
+                  className="text-amber-400/60 hover:text-amber-300 transition-colors"
+                >
+                  <RefreshCw
+                    className={`w-3 h-3 ${statsLoading ? "animate-spin" : ""}`}
+                  />
                 </button>
               )}
               <Users className="w-4 h-4 text-amber-400" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className={`text-2xl font-bold font-mono text-amber-100 ${statsLoading ? 'animate-pulse' : ''}`}>
+            <span
+              className={`text-2xl font-bold font-mono text-amber-100 ${statsLoading ? "animate-pulse" : ""}`}
+            >
               {totalParticipants}
             </span>
           </div>
-          <span className="text-[10px] text-amber-200/40 mt-1 block">{completedCount} completed</span>
+          <span className="text-[10px] text-amber-200/40 mt-1 block">
+            {completedCount} completed
+          </span>
         </div>
 
         {/* Development */}
         <div className="p-4 rounded-xl bg-blue-950/40 border border-blue-500/30 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-blue-200/80">Development</span>
+            <span className="text-[11px] font-medium text-blue-200/80">
+              Development
+            </span>
             <Code className="w-4 h-4 text-blue-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className={`text-2xl font-bold font-mono text-blue-100 ${statsLoading ? 'animate-pulse' : ''}`}>{devCount}</span>
+            <span
+              className={`text-2xl font-bold font-mono text-blue-100 ${statsLoading ? "animate-pulse" : ""}`}
+            >
+              {devCount}
+            </span>
             <span className="text-xs text-blue-300 font-mono">{devPct}%</span>
           </div>
           <div className="w-full h-1 bg-blue-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${devPct}%` }} />
+            <div
+              className="h-full bg-blue-500 transition-all duration-500"
+              style={{ width: `${devPct}%` }}
+            />
           </div>
         </div>
 
         {/* Design */}
         <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-rose-200/80">Design</span>
+            <span className="text-[11px] font-medium text-rose-200/80">
+              Design
+            </span>
             <Palette className="w-4 h-4 text-rose-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className={`text-2xl font-bold font-mono text-rose-100 ${statsLoading ? 'animate-pulse' : ''}`}>{desCount}</span>
+            <span
+              className={`text-2xl font-bold font-mono text-rose-100 ${statsLoading ? "animate-pulse" : ""}`}
+            >
+              {desCount}
+            </span>
             <span className="text-xs text-rose-300 font-mono">{desPct}%</span>
           </div>
           <div className="w-full h-1 bg-rose-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-rose-500 transition-all duration-500" style={{ width: `${desPct}%` }} />
+            <div
+              className="h-full bg-rose-500 transition-all duration-500"
+              style={{ width: `${desPct}%` }}
+            />
           </div>
         </div>
 
         {/* Events */}
         <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-emerald-200/80">Events</span>
+            <span className="text-[11px] font-medium text-emerald-200/80">
+              Events
+            </span>
             <Calendar className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className={`text-2xl font-bold font-mono text-emerald-100 ${statsLoading ? 'animate-pulse' : ''}`}>{evtCount}</span>
-            <span className="text-xs text-emerald-300 font-mono">{evtPct}%</span>
+            <span
+              className={`text-2xl font-bold font-mono text-emerald-100 ${statsLoading ? "animate-pulse" : ""}`}
+            >
+              {evtCount}
+            </span>
+            <span className="text-xs text-emerald-300 font-mono">
+              {evtPct}%
+            </span>
           </div>
           <div className="w-full h-1 bg-emerald-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${evtPct}%` }} />
+            <div
+              className="h-full bg-emerald-500 transition-all duration-500"
+              style={{ width: `${evtPct}%` }}
+            />
           </div>
         </div>
 
         {/* Social Media */}
         <div className="p-4 rounded-xl bg-purple-950/40 border border-purple-500/30 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-purple-200/80">Social Media</span>
+            <span className="text-[11px] font-medium text-purple-200/80">
+              Social Media
+            </span>
             <Megaphone className="w-4 h-4 text-purple-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className={`text-2xl font-bold font-mono text-purple-100 ${statsLoading ? 'animate-pulse' : ''}`}>{smCount}</span>
+            <span
+              className={`text-2xl font-bold font-mono text-purple-100 ${statsLoading ? "animate-pulse" : ""}`}
+            >
+              {smCount}
+            </span>
             <span className="text-xs text-purple-300 font-mono">{smPct}%</span>
           </div>
           <div className="w-full h-1 bg-purple-900/50 rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-purple-500 transition-all duration-500" style={{ width: `${smPct}%` }} />
+            <div
+              className="h-full bg-purple-500 transition-all duration-500"
+              style={{ width: `${smPct}%` }}
+            />
           </div>
         </div>
       </div>
@@ -267,30 +363,67 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             {/* SVG Donut Chart — driven by live percentages */}
             <div className="relative w-32 h-32 flex items-center justify-center shrink-0">
               <svg className="w-32 h-32 -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" stroke="#1e293b" strokeWidth="14" fill="transparent" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#1e293b"
+                  strokeWidth="14"
+                  fill="transparent"
+                />
                 {/* Development */}
-                <circle cx="50" cy="50" r="40" stroke="#3b82f6" strokeWidth="14"
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#3b82f6"
+                  strokeWidth="14"
                   strokeDasharray={`${devDash} ${CIRC}`}
                   strokeDashoffset={devOffset}
-                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                  fill="transparent"
+                  style={{ transition: "stroke-dasharray 0.6s ease" }}
+                />
                 {/* Events */}
-                <circle cx="50" cy="50" r="40" stroke="#10b981" strokeWidth="14"
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#10b981"
+                  strokeWidth="14"
                   strokeDasharray={`${evtDash} ${CIRC}`}
                   strokeDashoffset={evtOffset}
-                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                  fill="transparent"
+                  style={{ transition: "stroke-dasharray 0.6s ease" }}
+                />
                 {/* Design */}
-                <circle cx="50" cy="50" r="40" stroke="#f43f5e" strokeWidth="14"
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#f43f5e"
+                  strokeWidth="14"
                   strokeDasharray={`${desDash} ${CIRC}`}
                   strokeDashoffset={desOffset}
-                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                  fill="transparent"
+                  style={{ transition: "stroke-dasharray 0.6s ease" }}
+                />
                 {/* Social Media */}
-                <circle cx="50" cy="50" r="40" stroke="#a855f7" strokeWidth="14"
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#a855f7"
+                  strokeWidth="14"
                   strokeDasharray={`${smDash} ${CIRC}`}
                   strokeDashoffset={smOffset}
-                  fill="transparent" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                  fill="transparent"
+                  style={{ transition: "stroke-dasharray 0.6s ease" }}
+                />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`font-mono text-xl font-bold text-amber-100 ${statsLoading ? 'animate-pulse' : ''}`}>
+                <span
+                  className={`font-mono text-xl font-bold text-amber-100 ${statsLoading ? "animate-pulse" : ""}`}
+                >
                   {totalParticipants}
                 </span>
                 <span className="text-[10px] text-amber-200/50">Total</span>
@@ -304,28 +437,36 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
                   <span className="w-2 h-2 rounded-full bg-blue-500" />
                   <span className="text-slate-300">Development</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">{devCount} ({devPct}%)</span>
+                <span className="font-mono text-amber-100 font-semibold">
+                  {devCount} ({devPct}%)
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-rose-500" />
                   <span className="text-slate-300">Design</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">{desCount} ({desPct}%)</span>
+                <span className="font-mono text-amber-100 font-semibold">
+                  {desCount} ({desPct}%)
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   <span className="text-slate-300">Events</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">{evtCount} ({evtPct}%)</span>
+                <span className="font-mono text-amber-100 font-semibold">
+                  {evtCount} ({evtPct}%)
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-purple-500" />
                   <span className="text-slate-300">Social Media</span>
                 </div>
-                <span className="font-mono text-amber-100 font-semibold">{smCount} ({smPct}%)</span>
+                <span className="font-mono text-amber-100 font-semibold">
+                  {smCount} ({smPct}%)
+                </span>
               </div>
             </div>
           </div>
@@ -337,14 +478,30 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <h3 className="font-fantasy font-bold text-sm text-amber-200">
               Registrations Over Time
             </h3>
-            <span className="text-[10px] text-amber-400/60 font-mono">This Week</span>
+            <span className="text-[10px] text-amber-400/60 font-mono">
+              This Week
+            </span>
           </div>
 
           <div className="h-36 w-full flex flex-col justify-end pt-2">
             <svg className="w-full h-28 overflow-visible" viewBox="0 0 280 80">
               {/* Grid lines */}
-              <line x1="0" y1="20" x2="280" y2="20" stroke="#1e293b" strokeDasharray="3 3" />
-              <line x1="0" y1="50" x2="280" y2="50" stroke="#1e293b" strokeDasharray="3 3" />
+              <line
+                x1="0"
+                y1="20"
+                x2="280"
+                y2="20"
+                stroke="#1e293b"
+                strokeDasharray="3 3"
+              />
+              <line
+                x1="0"
+                y1="50"
+                x2="280"
+                y2="50"
+                stroke="#1e293b"
+                strokeDasharray="3 3"
+              />
               <line x1="0" y1="80" x2="280" y2="80" stroke="#1e293b" />
 
               {/* Area fill */}
@@ -360,8 +517,24 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
                 points="10,75 50,60 90,65 130,45 170,45 210,25 250,15"
               />
               {/* Dots */}
-              {[[10,75],[50,60],[90,65],[130,45],[170,45],[210,25],[250,15]].map(([cx, cy], i) => (
-                <circle key={i} cx={cx} cy={cy} r="4" fill="#fbbf24" stroke="#090a0f" strokeWidth="2" />
+              {[
+                [10, 75],
+                [50, 60],
+                [90, 65],
+                [130, 45],
+                [170, 45],
+                [210, 25],
+                [250, 15],
+              ].map(([cx, cy], i) => (
+                <circle
+                  key={i}
+                  cx={cx}
+                  cy={cy}
+                  r="4"
+                  fill="#fbbf24"
+                  stroke="#090a0f"
+                  strokeWidth="2"
+                />
               ))}
             </svg>
             <div className="flex items-center justify-between text-[10px] text-amber-300/60 pt-2 font-mono">
@@ -385,25 +558,53 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
           <div className="flex items-center justify-center gap-4">
             <div className="relative w-24 h-24 flex items-center justify-center">
               <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" stroke="#1e293b" strokeWidth="10" fill="transparent" />
-                <circle cx="50" cy="50" r="40" stroke="#f59e0b" strokeWidth="10"
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#1e293b"
+                  strokeWidth="10"
+                  fill="transparent"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="#f59e0b"
+                  strokeWidth="10"
                   strokeDasharray={`${gaugeDash} ${CIRC}`}
-                  strokeLinecap="round" fill="transparent"
-                  style={{ transition: 'stroke-dasharray 0.6s ease' }} />
+                  strokeLinecap="round"
+                  fill="transparent"
+                  style={{ transition: "stroke-dasharray 0.6s ease" }}
+                />
               </svg>
-              <span className={`absolute font-mono text-xl font-bold text-amber-100 ${statsLoading ? 'animate-pulse' : ''}`}>
+              <span
+                className={`absolute font-mono text-xl font-bold text-amber-100 ${statsLoading ? "animate-pulse" : ""}`}
+              >
                 {completionRate}%
               </span>
             </div>
 
             <div className="space-y-2 text-xs">
               <div>
-                <span className={`font-mono text-base font-bold text-emerald-400 ${statsLoading ? 'animate-pulse' : ''}`}>{completedCount}</span>
-                <span className="text-[11px] text-slate-400 block">Completed</span>
+                <span
+                  className={`font-mono text-base font-bold text-emerald-400 ${statsLoading ? "animate-pulse" : ""}`}
+                >
+                  {completedCount}
+                </span>
+                <span className="text-[11px] text-slate-400 block">
+                  Completed
+                </span>
               </div>
               <div>
-                <span className={`font-mono text-base font-bold text-amber-400 ${statsLoading ? 'animate-pulse' : ''}`}>{inProgressCount}</span>
-                <span className="text-[11px] text-slate-400 block">In Progress</span>
+                <span
+                  className={`font-mono text-base font-bold text-amber-400 ${statsLoading ? "animate-pulse" : ""}`}
+                >
+                  {inProgressCount}
+                </span>
+                <span className="text-[11px] text-slate-400 block">
+                  In Progress
+                </span>
               </div>
             </div>
           </div>
@@ -492,24 +693,31 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
             <tbody className="divide-y divide-amber-950/40">
               {filtered.map((p, idx) => {
                 const deptColor =
-                  p.department === 'development'
-                    ? 'bg-blue-950/70 text-blue-300 border-blue-500/40'
-                    : p.department === 'design'
-                    ? 'bg-rose-950/70 text-rose-300 border-rose-500/40'
-                    : p.department === 'events'
-                    ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40'
-                    : 'bg-purple-950/70 text-purple-300 border-purple-500/40';
+                  p.department === "development"
+                    ? "bg-blue-950/70 text-blue-300 border-blue-500/40"
+                    : p.department === "design"
+                      ? "bg-rose-950/70 text-rose-300 border-rose-500/40"
+                      : p.department === "events"
+                        ? "bg-emerald-950/70 text-emerald-300 border-emerald-500/40"
+                        : "bg-purple-950/70 text-purple-300 border-purple-500/40";
 
                 return (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3 px-3 font-mono text-slate-500">{idx + 1}</td>
+                  <tr
+                    key={p.id}
+                    className="hover:bg-slate-800/40 transition-colors"
+                  >
+                    <td className="py-3 px-3 font-mono text-slate-500">
+                      {idx + 1}
+                    </td>
                     <td className="py-3 px-3 font-semibold text-amber-100 flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[10px] font-bold">
                         {p.fullName.charAt(0)}
                       </div>
                       <span>{p.fullName}</span>
                     </td>
-                    <td className="py-3 px-3 text-slate-300 font-mono text-[11px]">{p.email}</td>
+                    <td className="py-3 px-3 text-slate-300 font-mono text-[11px]">
+                      {p.email}
+                    </td>
                     <td className="py-3 px-3 text-amber-200/80 font-mono text-[11px]">
                       {p.studyYear}
                     </td>
@@ -517,17 +725,19 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
                       <span
                         className={`px-2 py-0.5 rounded border text-[10px] font-semibold uppercase tracking-wider ${deptColor}`}
                       >
-                        {p.department?.replace('_', ' ') || 'Pending'}
+                        {p.department?.replace("_", " ") || "Pending"}
                       </span>
                     </td>
                     <td className="py-3 px-3">
                       <span
                         className={`inline-flex items-center gap-1 text-[11px] ${
-                          p.status === 'Completed' ? 'text-emerald-400' : 'text-amber-400'
+                          p.status === "Completed"
+                            ? "text-emerald-400"
+                            : "text-amber-400"
                         }`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                        {p.status || 'Completed'}
+                        {p.status || "Completed"}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">
@@ -537,7 +747,7 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
                       <button
                         onClick={() => {
                           sounds.playClick();
-                          onNavigate('member_profile');
+                          onNavigate("member_profile");
                         }}
                         className="text-amber-400/80 hover:text-amber-300 text-xs font-semibold hover:underline"
                       >
@@ -560,7 +770,7 @@ export const Screen9AdminDashboard: FC<Screen9AdminDashboardProps> = ({
         <button
           onClick={() => {
             sounds.playClick();
-            onNavigate('landing');
+            onNavigate("landing");
           }}
           className="flex items-center gap-1.5 text-amber-400 hover:text-amber-300 font-semibold cursor-pointer"
         >

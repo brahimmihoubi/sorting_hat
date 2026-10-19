@@ -1,8 +1,8 @@
-import { useState, FC } from 'react';
-import { ScreenId } from '../types';
-import { ASSETS } from '../assets';
-import { sounds } from '../utils/audio';
-import { Volume2, VolumeX, Music, MonitorPlay } from 'lucide-react';
+import { useState, FC } from "react";
+import { ScreenId } from "../types";
+import { ASSETS } from "../public/assets";
+import { sounds } from "../utils/audio";
+import { Volume2, VolumeX, Music, MonitorPlay } from "lucide-react";
 
 interface NavbarProps {
   currentScreen: ScreenId;
@@ -38,9 +38,9 @@ export const Navbar: FC<NavbarProps> = ({
   };
 
   const navLinks: { label: string; screen: ScreenId; highlight?: boolean }[] = [
-    { label: 'Home', screen: 'landing' },
-    { label: 'Departments', screen: 'departments_overview' },
-    { label: 'Sorting Hat', screen: 'welcome', highlight: true },
+    { label: "Home", screen: "landing" },
+    { label: "Departments", screen: "departments_overview" },
+    { label: "Sorting Hat", screen: "welcome", highlight: true },
   ];
 
   return (
@@ -50,7 +50,7 @@ export const Navbar: FC<NavbarProps> = ({
         <button
           onClick={() => {
             sounds.playClick();
-            onNavigate('landing');
+            onNavigate("landing");
           }}
           className="flex items-center gap-3.5 text-left group focus:outline-none"
         >
@@ -80,10 +80,14 @@ export const Navbar: FC<NavbarProps> = ({
           {navLinks.map((item) => {
             const isActive =
               currentScreen === item.screen ||
-              (item.screen === 'welcome' &&
-                ['welcome', 'personal_info', 'questionnaire', 'sorting_animation', 'sorting_result'].includes(
-                  currentScreen
-                ));
+              (item.screen === "welcome" &&
+                [
+                  "welcome",
+                  "personal_info",
+                  "questionnaire",
+                  "sorting_animation",
+                  "sorting_result",
+                ].includes(currentScreen));
 
             return (
               <button
@@ -94,8 +98,8 @@ export const Navbar: FC<NavbarProps> = ({
                 }}
                 className={`relative py-1.5 transition-colors whitespace-nowrap ${
                   isActive
-                    ? 'text-amber-300 font-semibold'
-                    : 'text-amber-100/70 hover:text-amber-200'
+                    ? "text-amber-300 font-semibold"
+                    : "text-amber-100/70 hover:text-amber-200"
                 }`}
               >
                 {item.label}
@@ -109,7 +113,7 @@ export const Navbar: FC<NavbarProps> = ({
           <button
             onClick={() => {
               sounds.playClick();
-              onNavigate('event_mode');
+              onNavigate("event_mode");
             }}
             className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-colors"
             title="Open Large Projector Event Mode"
@@ -139,26 +143,38 @@ export const Navbar: FC<NavbarProps> = ({
           {/* Theme Music Toggle */}
           <button
             onClick={toggleMusic}
-            aria-label={musicOn ? 'Pause Hedwig Theme' : 'Play Hedwig Theme'}
+            aria-label={musicOn ? "Pause Hedwig Theme" : "Play Hedwig Theme"}
             className={`h-9 px-3.5 rounded-full border flex items-center gap-1.5 text-xs font-semibold tracking-wide transition-all cursor-pointer ${
               musicOn
-                ? 'bg-gradient-to-r from-amber-500/30 via-yellow-400/25 to-amber-600/30 border-amber-300 text-amber-100 shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse'
-                : 'bg-slate-950/80 border-amber-500/40 text-amber-300/90 hover:text-amber-100 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(245,158,11,0.35)]'
+                ? "bg-gradient-to-r from-amber-500/30 via-yellow-400/25 to-amber-600/30 border-amber-300 text-amber-100 shadow-[0_0_16px_rgba(251,191,36,0.6)] animate-pulse"
+                : "bg-slate-950/80 border-amber-500/40 text-amber-300/90 hover:text-amber-100 hover:border-amber-400 hover:shadow-[0_0_12px_rgba(245,158,11,0.35)]"
             }`}
-            title={musicOn ? 'Pause Harry Potter Theme' : 'Play Harry Potter Theme (Hedwig’s Song)'}
+            title={
+              musicOn
+                ? "Pause Harry Potter Theme"
+                : "Play Harry Potter Theme (Hedwig’s Song)"
+            }
           >
-            <Music className={`w-3.5 h-3.5 ${musicOn ? 'text-amber-200' : 'text-amber-400'}`} />
-            <span className="hidden sm:inline font-serif">{musicOn ? 'Theme Playing ♪' : 'Hedwig Theme'}</span>
+            <Music
+              className={`w-3.5 h-3.5 ${musicOn ? "text-amber-200" : "text-amber-400"}`}
+            />
+            <span className="hidden sm:inline font-serif">
+              {musicOn ? "Theme Playing ♪" : "Hedwig Theme"}
+            </span>
           </button>
 
           {/* Sound Toggle */}
           <button
             onClick={toggleSound}
-            aria-label={soundOn ? 'Mute sound effects' : 'Enable sound effects'}
+            aria-label={soundOn ? "Mute sound effects" : "Enable sound effects"}
             className="w-9 h-9 rounded-full bg-slate-900/80 border border-amber-900/40 flex items-center justify-center text-amber-300/80 hover:text-amber-200 hover:border-amber-600/60 transition-colors"
-            title={soundOn ? 'Sound FX On' : 'Sound FX Muted'}
+            title={soundOn ? "Sound FX On" : "Sound FX Muted"}
           >
-            {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+            {soundOn ? (
+              <Volume2 className="w-4 h-4" />
+            ) : (
+              <VolumeX className="w-4 h-4 text-slate-500" />
+            )}
           </button>
 
           {/* Join SDG CTA */}
@@ -168,13 +184,15 @@ export const Navbar: FC<NavbarProps> = ({
               if (onOpenJoinModal) {
                 onOpenJoinModal();
               } else {
-                onNavigate('welcome');
+                onNavigate("welcome");
               }
             }}
             className="relative group overflow-hidden px-4.5 py-2 rounded-lg bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 hover:from-amber-600 hover:to-yellow-500 text-slate-950 font-semibold text-xs sm:text-sm tracking-wide shadow-[0_0_20px_rgba(245,158,11,0.25)] border border-amber-300/30 transition-all flex items-center gap-2 whitespace-nowrap active:scale-95"
           >
             <span>Join SDG</span>
-            <span className="text-xs transition-transform group-hover:translate-x-1">→</span>
+            <span className="text-xs transition-transform group-hover:translate-x-1">
+              →
+            </span>
           </button>
         </div>
       </div>

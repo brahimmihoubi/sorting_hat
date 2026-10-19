@@ -1,7 +1,7 @@
-import { FC, useState } from 'react';
-import { ScreenId } from '../types';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
+import { FC, useState } from "react";
+import { ScreenId } from "../types";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
 import {
   Maximize2,
   Minimize2,
@@ -17,7 +17,7 @@ import {
   Calendar,
   Megaphone,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Screen11EventModeProps {
   onStartTest: () => void;
@@ -29,11 +29,18 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
   onNavigate,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedPresentation, setSelectedPresentation] = useState<string | null>(null);
+  const [selectedPresentation, setSelectedPresentation] = useState<
+    string | null
+  >(null);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showStageCeremonyModal, setShowStageCeremonyModal] = useState(false);
-  const [ceremonyStep, setCeremonyStep] = useState<'idle' | 'sorting' | 'revealed'>('idle');
-  const [stageParticipant, setStageParticipant] = useState({ name: 'Anis Belhadj', dept: 'development' });
+  const [ceremonyStep, setCeremonyStep] = useState<
+    "idle" | "sorting" | "revealed"
+  >("idle");
+  const [stageParticipant, setStageParticipant] = useState({
+    name: "Anis Belhadj",
+    dept: "development",
+  });
 
   const toggleFullscreen = () => {
     sounds.playClick();
@@ -49,12 +56,12 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
   };
 
   const agenda = [
-    { time: '10:00', title: 'Welcome & Introduction', status: 'past' },
-    { time: '10:15', title: 'About SDG', status: 'past' },
-    { time: '10:30', title: 'Departments Presentation', status: 'current' },
-    { time: '11:15', title: 'Live Q&A', status: 'upcoming' },
-    { time: '11:45', title: 'Sorting Hat Test', status: 'upcoming' },
-    { time: '12:15', title: 'Results & Next Steps', status: 'upcoming' },
+    { time: "10:00", title: "Welcome & Introduction", status: "past" },
+    { time: "10:15", title: "About SDG", status: "past" },
+    { time: "10:30", title: "Departments Presentation", status: "current" },
+    { time: "11:15", title: "Live Q&A", status: "upcoming" },
+    { time: "11:45", title: "Sorting Hat Test", status: "upcoming" },
+    { time: "12:15", title: "Results & Next Steps", status: "upcoming" },
   ];
 
   return (
@@ -90,15 +97,19 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
             onClick={toggleFullscreen}
             className="btn-notch-ghost px-3 py-2 text-xs flex items-center gap-2"
           >
-            {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-            <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
+            {isFullscreen ? (
+              <Minimize2 className="w-3.5 h-3.5" />
+            ) : (
+              <Maximize2 className="w-3.5 h-3.5" />
+            )}
+            <span>{isFullscreen ? "Exit Fullscreen" : "Fullscreen"}</span>
           </button>
 
           <button
             onClick={() => {
               sounds.playChime(650);
               setShowStageCeremonyModal(true);
-              setCeremonyStep('idle');
+              setCeremonyStep("idle");
             }}
             className="btn-notch-primary px-5 py-2 text-xs sm:text-sm flex items-center gap-2 cursor-pointer"
           >
@@ -137,8 +148,8 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
                 The Sorting Hat Awakens
               </div>
               <p className="text-xs sm:text-sm text-amber-200/80 max-w-lg mx-auto">
-                Scan the auditorium QR code or tap below to discover your department live on the
-                big screen!
+                Scan the auditorium QR code or tap below to discover your
+                department live on the big screen!
               </p>
             </div>
           </div>
@@ -159,7 +170,7 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  setSelectedPresentation('Development');
+                  setSelectedPresentation("Development");
                 }}
                 className="btn-notch-ghost w-full py-1.5 px-2 text-xs flex items-center justify-center gap-1.5"
               >
@@ -182,7 +193,7 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  setSelectedPresentation('Design');
+                  setSelectedPresentation("Design");
                 }}
                 className="btn-notch-ghost w-full py-1.5 px-2 text-xs flex items-center justify-center gap-1.5"
               >
@@ -205,7 +216,7 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  setSelectedPresentation('Events');
+                  setSelectedPresentation("Events");
                 }}
                 className="btn-notch-ghost w-full py-1.5 px-2 text-xs flex items-center justify-center gap-1.5"
               >
@@ -228,7 +239,7 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
               <button
                 onClick={() => {
                   sounds.playClick();
-                  setSelectedPresentation('Social Media');
+                  setSelectedPresentation("Social Media");
                 }}
                 className="btn-notch-ghost w-full py-1.5 px-2 text-xs flex items-center justify-center gap-1.5"
               >
@@ -268,18 +279,18 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
 
             <div className="space-y-3 relative">
               {agenda.map((item, idx) => {
-                const isCurrent = item.status === 'current';
-                const isPast = item.status === 'past';
+                const isCurrent = item.status === "current";
+                const isPast = item.status === "past";
 
                 return (
                   <div key={idx} className="flex items-center gap-3.5">
                     <span
                       className={`font-mono text-xs w-12 font-semibold ${
                         isCurrent
-                          ? 'text-amber-400 font-bold'
+                          ? "text-amber-400 font-bold"
                           : isPast
-                          ? 'text-slate-400'
-                          : 'text-slate-500'
+                            ? "text-slate-400"
+                            : "text-slate-500"
                       }`}
                     >
                       {item.time}
@@ -288,20 +299,20 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
                     <span
                       className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                         isCurrent
-                          ? 'bg-amber-400 shadow-[0_0_10px_#f59e0b] animate-ping'
+                          ? "bg-amber-400 shadow-[0_0_10px_#f59e0b] animate-ping"
                           : isPast
-                          ? 'bg-emerald-500'
-                          : 'bg-slate-700'
+                            ? "bg-emerald-500"
+                            : "bg-slate-700"
                       }`}
                     />
 
                     <span
                       className={`text-xs ${
                         isCurrent
-                          ? 'text-amber-200 font-bold'
+                          ? "text-amber-200 font-bold"
                           : isPast
-                          ? 'text-slate-300'
-                          : 'text-slate-400'
+                            ? "text-slate-300"
+                            : "text-slate-400"
                       }`}
                     >
                       {item.title}
@@ -319,8 +330,12 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xl font-bold font-mono text-amber-100">248</div>
-                <div className="text-[11px] text-amber-200/60">Total Participants</div>
+                <div className="text-xl font-bold font-mono text-amber-100">
+                  248
+                </div>
+                <div className="text-[11px] text-amber-200/60">
+                  Total Participants
+                </div>
               </div>
             </div>
 
@@ -329,7 +344,9 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
                 <Award className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xl font-bold font-mono text-amber-100">4</div>
+                <div className="text-xl font-bold font-mono text-amber-100">
+                  4
+                </div>
                 <div className="text-[11px] text-amber-200/60">Departments</div>
               </div>
             </div>
@@ -339,8 +356,12 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xl font-bold font-mono text-amber-100">100%</div>
-                <div className="text-[11px] text-amber-200/60">Unique Opportunities</div>
+                <div className="text-xl font-bold font-mono text-amber-100">
+                  100%
+                </div>
+                <div className="text-[11px] text-amber-200/60">
+                  Unique Opportunities
+                </div>
               </div>
             </div>
           </div>
@@ -370,9 +391,12 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
             <div className="text-xs font-fantasy font-bold tracking-widest uppercase">
               SCAN TO TAKE TEST
             </div>
-            <h3 className="text-2xl font-bold font-fantasy">Welcome Day Mobile Portal</h3>
+            <h3 className="text-2xl font-bold font-fantasy">
+              Welcome Day Mobile Portal
+            </h3>
             <p className="text-xs text-amber-900/80">
-              Point your phone camera at this code to open the Sorting Hat questionnaire right now!
+              Point your phone camera at this code to open the Sorting Hat
+              questionnaire right now!
             </p>
             {/* Stylized QR Code Frame */}
             <div className="w-48 h-48 mx-auto bg-white p-3 rounded-2xl border-4 border-amber-900/40 shadow-inner flex items-center justify-center">
@@ -411,8 +435,8 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
               </div>
             </div>
             <p className="text-xs text-amber-100/70 leading-relaxed">
-              Explore the mission, leadership team, and ongoing flagship projects of the{' '}
-              {selectedPresentation} Department.
+              Explore the mission, leadership team, and ongoing flagship
+              projects of the {selectedPresentation} Department.
             </p>
           </div>
         </div>
@@ -434,11 +458,11 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-extrabold font-fantasy text-amber-100">
-              {ceremonyStep === 'idle'
+              {ceremonyStep === "idle"
                 ? `Sorting Candidate: ${stageParticipant.name}`
-                : ceremonyStep === 'sorting'
-                ? 'The Hat is Deliberating Destiny...'
-                : `${stageParticipant.name} is Sorted into ${stageParticipant.dept.toUpperCase()}!`}
+                : ceremonyStep === "sorting"
+                  ? "The Hat is Deliberating Destiny..."
+                  : `${stageParticipant.name} is Sorted into ${stageParticipant.dept.toUpperCase()}!`}
             </h2>
 
             <div className="w-24 h-0.5 bg-amber-500/40 mx-auto" />
@@ -459,17 +483,17 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
 
             {/* Controls */}
             <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-              {ceremonyStep === 'idle' && (
+              {ceremonyStep === "idle" && (
                 <button
                   onClick={() => {
                     sounds.playSortingResonance();
-                    setCeremonyStep('sorting');
+                    setCeremonyStep("sorting");
                     setTimeout(() => {
                       sounds.playHatRumble();
                     }, 1800);
                     setTimeout(() => {
                       sounds.playDepartmentReveal(stageParticipant.dept);
-                      setCeremonyStep('revealed');
+                      setCeremonyStep("revealed");
                     }, 3000);
                   }}
                   className="btn-notch-primary px-8 py-3 text-sm sm:text-base flex items-center gap-2 cursor-pointer shadow-xl"
@@ -479,33 +503,40 @@ export const Screen11EventMode: FC<Screen11EventModeProps> = ({
                 </button>
               )}
 
-              {ceremonyStep === 'sorting' && (
+              {ceremonyStep === "sorting" && (
                 <div className="text-amber-300 font-mono text-sm animate-pulse flex items-center gap-2">
                   <Sparkles className="w-4 h-4 animate-spin" />
                   <span>Analyzing energy & matching house portal...</span>
                 </div>
               )}
 
-              {ceremonyStep === 'revealed' && (
+              {ceremonyStep === "revealed" && (
                 <div className="space-y-4">
                   <div className="text-xl sm:text-2xl font-bold font-fantasy text-amber-200">
-                    Welcome to the {stageParticipant.dept.replace('_', ' ').toUpperCase()} Department!
+                    Welcome to the{" "}
+                    {stageParticipant.dept.replace("_", " ").toUpperCase()}{" "}
+                    Department!
                   </div>
                   <button
                     onClick={() => {
                       sounds.playClick();
-                      const names = ['Lina Benseghir', 'Farid Belhadj', 'Yacine Amrani', 'Amira Zineddine'];
-                      const depts: ('development' | 'design' | 'events' | 'social_media')[] = [
-                        'development',
-                        'design',
-                        'events',
-                        'social_media',
+                      const names = [
+                        "Lina Benseghir",
+                        "Farid Belhadj",
+                        "Yacine Amrani",
+                        "Amira Zineddine",
                       ];
+                      const depts: (
+                        | "development"
+                        | "design"
+                        | "events"
+                        | "social_media"
+                      )[] = ["development", "design", "events", "social_media"];
                       setStageParticipant({
                         name: names[Math.floor(Math.random() * names.length)],
                         dept: depts[Math.floor(Math.random() * depts.length)],
                       });
-                      setCeremonyStep('idle');
+                      setCeremonyStep("idle");
                     }}
                     className="btn-notch-ghost px-6 py-2 text-xs sm:text-sm inline-flex items-center gap-2 cursor-pointer"
                   >

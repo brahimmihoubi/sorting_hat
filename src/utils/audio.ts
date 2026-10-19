@@ -1,4 +1,4 @@
-import { ASSETS } from '../assets';
+import { ASSETS } from "../public/assets";
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
@@ -7,19 +7,22 @@ class SoundEngine {
   public isMusicPlaying: boolean = false;
 
   private initCtx() {
-    if (!this.ctx && typeof window !== 'undefined') {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!this.ctx && typeof window !== "undefined") {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === "suspended") {
       this.ctx.resume();
     }
   }
 
   public playThemeMusic() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     try {
       if (!this.bgMusic) {
         this.bgMusic = new Audio(ASSETS.hedwigTheme);
@@ -27,11 +30,14 @@ class SoundEngine {
         this.bgMusic.volume = 0.45;
       }
       if (this.enabled) {
-        this.bgMusic.play().then(() => {
-          this.isMusicPlaying = true;
-        }).catch(() => {
-          // Autoplay blocked until user interaction
-        });
+        this.bgMusic
+          .play()
+          .then(() => {
+            this.isMusicPlaying = true;
+          })
+          .catch(() => {
+            // Autoplay blocked until user interaction
+          });
       }
     } catch {
       // ignore
@@ -64,12 +70,18 @@ class SoundEngine {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
-      osc.type = 'sine';
+      osc.type = "sine";
       osc.frequency.setValueAtTime(pitch, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(pitch * 1.5, this.ctx.currentTime + 0.4);
+      osc.frequency.exponentialRampToValueAtTime(
+        pitch * 1.5,
+        this.ctx.currentTime + 0.4,
+      );
 
       gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.8);
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        this.ctx.currentTime + 0.8,
+      );
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -91,12 +103,18 @@ class SoundEngine {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
-      osc.type = 'triangle';
+      osc.type = "triangle";
       osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(180, this.ctx.currentTime + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(
+        180,
+        this.ctx.currentTime + 0.08,
+      );
 
       gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+      gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        this.ctx.currentTime + 0.08,
+      );
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -121,12 +139,18 @@ class SoundEngine {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
 
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.1);
-        osc.frequency.exponentialRampToValueAtTime(f * 1.2, this.ctx.currentTime + 1.2);
+        osc.frequency.exponentialRampToValueAtTime(
+          f * 1.2,
+          this.ctx.currentTime + 1.2,
+        );
 
         gain.gain.setValueAtTime(0.05, this.ctx.currentTime + i * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.4);
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          this.ctx.currentTime + 1.4,
+        );
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -153,11 +177,14 @@ class SoundEngine {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
 
-        osc.type = 'triangle';
+        osc.type = "triangle";
         osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
 
         gain.gain.setValueAtTime(0.06, this.ctx.currentTime + idx * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 1.2);
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          this.ctx.currentTime + idx * 0.08 + 1.2,
+        );
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -186,18 +213,24 @@ class SoundEngine {
       const curve = new Float32Array(256);
       for (let i = 0; i < 256; i++) {
         const x = (i * 2) / 256 - 1;
-        curve[i] = (Math.PI + 200) * x / (Math.PI + 200 * Math.abs(x));
+        curve[i] = ((Math.PI + 200) * x) / (Math.PI + 200 * Math.abs(x));
       }
       distortion.curve = curve;
 
-      osc.type = 'sawtooth';
+      osc.type = "sawtooth";
       osc.frequency.setValueAtTime(60, this.ctx.currentTime);
       osc.frequency.linearRampToValueAtTime(45, this.ctx.currentTime + 0.6);
-      osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 1.0);
+      osc.frequency.exponentialRampToValueAtTime(
+        30,
+        this.ctx.currentTime + 1.0,
+      );
 
       gainNode.gain.setValueAtTime(0.0001, this.ctx.currentTime);
       gainNode.gain.linearRampToValueAtTime(0.12, this.ctx.currentTime + 0.15);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.1);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.0001,
+        this.ctx.currentTime + 1.1,
+      );
 
       osc.connect(distortion);
       distortion.connect(gainNode);
@@ -209,12 +242,21 @@ class SoundEngine {
       // Overlay a high whisper shimmer
       const shimmer = this.ctx.createOscillator();
       const shimmerGain = this.ctx.createGain();
-      shimmer.type = 'sine';
+      shimmer.type = "sine";
       shimmer.frequency.setValueAtTime(880, this.ctx.currentTime);
-      shimmer.frequency.linearRampToValueAtTime(1320, this.ctx.currentTime + 1.0);
+      shimmer.frequency.linearRampToValueAtTime(
+        1320,
+        this.ctx.currentTime + 1.0,
+      );
       shimmerGain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-      shimmerGain.gain.linearRampToValueAtTime(0.04, this.ctx.currentTime + 0.4);
-      shimmerGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.2);
+      shimmerGain.gain.linearRampToValueAtTime(
+        0.04,
+        this.ctx.currentTime + 0.4,
+      );
+      shimmerGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        this.ctx.currentTime + 1.2,
+      );
       shimmer.connect(shimmerGain);
       shimmerGain.connect(this.ctx.destination);
       shimmer.start(this.ctx.currentTime);
@@ -238,26 +280,32 @@ class SoundEngine {
         const t = this.ctx.currentTime + i * 0.13;
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
-        osc.type = 'square';
+        osc.type = "square";
         osc.frequency.setValueAtTime(freq, t);
         g.gain.setValueAtTime(0.07, t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-        osc.connect(g); g.connect(this.ctx.destination);
-        osc.start(t); osc.stop(t + 0.2);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.2);
       });
 
       // Punchy low hit at the end
       const t2 = this.ctx.currentTime + notes.length * 0.13;
       const kick = this.ctx.createOscillator();
       const kickG = this.ctx.createGain();
-      kick.type = 'sine';
+      kick.type = "sine";
       kick.frequency.setValueAtTime(120, t2);
       kick.frequency.exponentialRampToValueAtTime(40, t2 + 0.25);
       kickG.gain.setValueAtTime(0.18, t2);
       kickG.gain.exponentialRampToValueAtTime(0.0001, t2 + 0.4);
-      kick.connect(kickG); kickG.connect(this.ctx.destination);
-      kick.start(t2); kick.stop(t2 + 0.45);
-    } catch { /* ignore */ }
+      kick.connect(kickG);
+      kickG.connect(this.ctx.destination);
+      kick.start(t2);
+      kick.stop(t2 + 0.45);
+    } catch {
+      /* ignore */
+    }
   }
 
   // Design dept – dreamy pentatonic harp glissando
@@ -268,20 +316,26 @@ class SoundEngine {
       if (!this.ctx) return;
 
       // Pentatonic scale: C D E G A  (two octaves up)
-      const pentatonic = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25, 783.99];
+      const pentatonic = [
+        261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25, 783.99,
+      ];
       pentatonic.forEach((freq, i) => {
         if (!this.ctx) return;
         const t = this.ctx.currentTime + i * 0.07;
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(freq, t);
         g.gain.setValueAtTime(0.06, t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
-        osc.connect(g); g.connect(this.ctx.destination);
-        osc.start(t); osc.stop(t + 0.65);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.65);
       });
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   // Events dept – upbeat festive major fanfare with reverb
@@ -296,7 +350,7 @@ class SoundEngine {
       melody.forEach((freq, i) => {
         if (!this.ctx) return;
         const t = this.ctx.currentTime + i * 0.12;
-        ['triangle', 'sine'].forEach((type, j) => {
+        ["triangle", "sine"].forEach((type, j) => {
           if (!this.ctx) return;
           const osc = this.ctx.createOscillator();
           const g = this.ctx.createGain();
@@ -304,11 +358,15 @@ class SoundEngine {
           osc.frequency.setValueAtTime(freq * (j === 1 ? 2 : 1), t);
           g.gain.setValueAtTime(j === 0 ? 0.07 : 0.03, t);
           g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
-          osc.connect(g); g.connect(this.ctx.destination);
-          osc.start(t); osc.stop(t + 0.25);
+          osc.connect(g);
+          g.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.25);
         });
       });
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   // Social Media dept – punchy modern synth arp with ring modulation feel
@@ -325,13 +383,15 @@ class SoundEngine {
         const t = this.ctx.currentTime + i * 0.09;
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
-        osc.type = 'sawtooth';
+        osc.type = "sawtooth";
         osc.frequency.setValueAtTime(freq, t);
         osc.frequency.linearRampToValueAtTime(freq * 1.02, t + 0.06);
         g.gain.setValueAtTime(0.06, t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
-        osc.connect(g); g.connect(this.ctx.destination);
-        osc.start(t); osc.stop(t + 0.18);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.18);
       });
 
       // Final two-note "boom-bap" accent
@@ -341,25 +401,39 @@ class SoundEngine {
         const t = tFinal + i * 0.15;
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(freq, t);
         osc.frequency.exponentialRampToValueAtTime(freq * 0.5, t + 0.2);
         g.gain.setValueAtTime(0.14, t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
-        osc.connect(g); g.connect(this.ctx.destination);
-        osc.start(t); osc.stop(t + 0.35);
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.35);
       });
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   // Dispatcher – call with the department id
   playDepartmentReveal(departmentId: string) {
     switch (departmentId) {
-      case 'development':  this.playDepartmentReveal_Development(); break;
-      case 'design':       this.playDepartmentReveal_Design();      break;
-      case 'events':       this.playDepartmentReveal_Events();      break;
-      case 'social_media': this.playDepartmentReveal_SocialMedia(); break;
-      default:             this.playRevealFanfare();                 break;
+      case "development":
+        this.playDepartmentReveal_Development();
+        break;
+      case "design":
+        this.playDepartmentReveal_Design();
+        break;
+      case "events":
+        this.playDepartmentReveal_Events();
+        break;
+      case "social_media":
+        this.playDepartmentReveal_SocialMedia();
+        break;
+      default:
+        this.playRevealFanfare();
+        break;
     }
   }
 }

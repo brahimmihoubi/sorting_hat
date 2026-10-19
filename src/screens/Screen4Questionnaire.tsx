@@ -1,9 +1,9 @@
-import type { FC } from 'react';
-import { ScreenId } from '../types';
-import { QUESTIONS } from '../data/questions';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
-import { WizardStepper } from '../components/WizardStepper';
+import type { FC } from "react";
+import { ScreenId } from "../types";
+import { QUESTIONS } from "../data/questions";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
+import { WizardStepper } from "../components/WizardStepper";
 import {
   Laptop,
   Palette,
@@ -37,66 +37,66 @@ import {
   ArrowRight,
   ArrowLeft,
   Sparkles,
-} from 'lucide-react';
+} from "lucide-react";
 
 // Icon mapper for question options
 const renderOptionIcon = (iconName?: string) => {
   switch (iconName) {
-    case 'laptop':
+    case "laptop":
       return <Laptop className="w-5 h-5" />;
-    case 'palette':
+    case "palette":
       return <Palette className="w-5 h-5" />;
-    case 'calendar':
+    case "calendar":
       return <Calendar className="w-5 h-5" />;
-    case 'megaphone':
+    case "megaphone":
       return <Megaphone className="w-5 h-5" />;
-    case 'code':
+    case "code":
       return <Code className="w-5 h-5" />;
-    case 'layout':
+    case "layout":
       return <Layout className="w-5 h-5" />;
-    case 'users':
+    case "users":
       return <Users className="w-5 h-5" />;
-    case 'trending-up':
+    case "trending-up":
       return <TrendingUp className="w-5 h-5" />;
-    case 'cpu':
+    case "cpu":
       return <Cpu className="w-5 h-5" />;
-    case 'feather':
+    case "feather":
       return <Feather className="w-5 h-5" />;
-    case 'heart':
+    case "heart":
       return <Heart className="w-5 h-5" />;
-    case 'share-2':
+    case "share-2":
       return <Share2 className="w-5 h-5" />;
-    case 'git-merge':
+    case "git-merge":
       return <GitMerge className="w-5 h-5" />;
-    case 'figma':
+    case "figma":
       return <Figma className="w-5 h-5" />;
-    case 'check-square':
+    case "check-square":
       return <CheckSquare className="w-5 h-5" />;
-    case 'mic':
+    case "mic":
       return <Mic className="w-5 h-5" />;
-    case 'terminal':
+    case "terminal":
       return <Terminal className="w-5 h-5" />;
-    case 'pen-tool':
+    case "pen-tool":
       return <PenTool className="w-5 h-5" />;
-    case 'message-circle':
+    case "message-circle":
       return <MessageCircle className="w-5 h-5" />;
-    case 'server':
+    case "server":
       return <Server className="w-5 h-5" />;
-    case 'image':
+    case "image":
       return <Image className="w-5 h-5" />;
-    case 'volume-2':
+    case "volume-2":
       return <Volume2 className="w-5 h-5" />;
-    case 'video':
+    case "video":
       return <Video className="w-5 h-5" />;
-    case 'eye':
+    case "eye":
       return <Eye className="w-5 h-5" />;
-    case 'shield':
+    case "shield":
       return <Shield className="w-5 h-5" />;
-    case 'send':
+    case "send":
       return <Send className="w-5 h-5" />;
-    case 'globe':
+    case "globe":
       return <Globe className="w-5 h-5" />;
-    case 'briefcase':
+    case "briefcase":
       return <Briefcase className="w-5 h-5" />;
     default:
       return <Sparkles className="w-5 h-5" />;
@@ -127,7 +127,9 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
 }) => {
   const currentQuestion = QUESTIONS[currentQuestionIndex] || QUESTIONS[0];
   const totalQuestions = QUESTIONS.length;
-  const progressPercent = Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100);
+  const progressPercent = Math.round(
+    ((currentQuestionIndex + 1) / totalQuestions) * 100,
+  );
   const selectedOptionId = answers[currentQuestion.id];
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
 
@@ -161,7 +163,8 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
               Question {currentQuestionIndex + 1} of {totalQuestions}
             </h2>
             <p className="text-xs sm:text-sm text-amber-200/70 max-w-md mx-auto">
-              Choose the option that best describes you. There are no right or wrong answers.
+              Choose the option that best describes you. There are no right or
+              wrong answers.
             </p>
 
             {/* Glowing Golden Progress Bar */}
@@ -189,7 +192,9 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
                 <h3 className="font-fantasy font-bold text-xl sm:text-2xl text-amber-950">
                   {currentQuestion.title}
                 </h3>
-                <span className="text-xs text-amber-900/70">Choose one option</span>
+                <span className="text-xs text-amber-900/70">
+                  Choose one option
+                </span>
               </div>
             </div>
 
@@ -205,21 +210,26 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
                       sounds.playChime(580);
                       onSelectOption(currentQuestion.id, opt.id);
                     }}
-                    style={isSelected ? {
-                      clipPath: 'polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px)'
-                    } : {}}
+                    style={
+                      isSelected
+                        ? {
+                            clipPath:
+                              "polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px)",
+                          }
+                        : {}
+                    }
                     className={`w-full text-left p-4 border transition-all duration-200 flex items-center justify-between gap-4 cursor-pointer ${
                       isSelected
-                        ? 'bg-gradient-to-r from-amber-300/90 via-amber-200/80 to-amber-300/70 border-amber-800 shadow-[0_4px_15px_rgba(180,120,40,0.35)]'
-                        : 'rounded-xl bg-amber-100/60 hover:bg-amber-100/90 border-amber-900/20 hover:border-amber-800/40'
+                        ? "bg-gradient-to-r from-amber-300/90 via-amber-200/80 to-amber-300/70 border-amber-800 shadow-[0_4px_15px_rgba(180,120,40,0.35)]"
+                        : "rounded-xl bg-amber-100/60 hover:bg-amber-100/90 border-amber-900/20 hover:border-amber-800/40"
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
                       <div
                         className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
                           isSelected
-                            ? 'bg-amber-900 text-amber-100'
-                            : 'bg-amber-900/15 text-amber-950'
+                            ? "bg-amber-900 text-amber-100"
+                            : "bg-amber-900/15 text-amber-950"
                         }`}
                       >
                         {renderOptionIcon(opt.icon)}
@@ -240,11 +250,13 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
                     <div
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                         isSelected
-                          ? 'border-amber-950 bg-amber-950'
-                          : 'border-amber-900/40 bg-transparent'
+                          ? "border-amber-950 bg-amber-950"
+                          : "border-amber-900/40 bg-transparent"
                       }`}
                     >
-                      {isSelected && <div className="w-2 h-2 rounded-full bg-amber-100" />}
+                      {isSelected && (
+                        <div className="w-2 h-2 rounded-full bg-amber-100" />
+                      )}
                     </div>
                   </button>
                 );
@@ -270,20 +282,39 @@ export const Screen4Questionnaire: FC<Screen4QuestionnaireProps> = ({
                 disabled={!selectedOptionId || isSubmitting}
                 onClick={handleNext}
                 className={`btn-notch-primary px-7 py-2.5 text-xs sm:text-sm flex items-center gap-2 ${
-                  !selectedOptionId || isSubmitting ? 'opacity-40 cursor-not-allowed' : ''
+                  !selectedOptionId || isSubmitting
+                    ? "opacity-40 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 {isSubmitting && isLastQuestion ? (
                   <>
-                    <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    <svg
+                      className="animate-spin w-3.5 h-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
                     </svg>
                     <span>Sorting…</span>
                   </>
                 ) : (
                   <>
-                    <span>{isLastQuestion ? 'Submit to Sorting Hat' : 'Next'}</span>
+                    <span>
+                      {isLastQuestion ? "Submit to Sorting Hat" : "Next"}
+                    </span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </>
                 )}

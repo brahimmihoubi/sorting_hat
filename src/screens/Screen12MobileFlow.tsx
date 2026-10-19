@@ -1,9 +1,9 @@
-import { FC, useState } from 'react';
-import { DepartmentId, ParticipantInfo, ScreenId } from '../types';
-import { DEPARTMENTS } from '../data/departments';
-import { QUESTIONS } from '../data/questions';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
+import { FC, useState } from "react";
+import { DepartmentId, ParticipantInfo, ScreenId } from "../types";
+import { DEPARTMENTS } from "../data/departments";
+import { QUESTIONS } from "../data/questions";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
 import {
   Smartphone,
   Sparkles,
@@ -17,7 +17,7 @@ import {
   User,
   RotateCcw,
   Share2,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Screen12MobileFlowProps {
   onNavigate: (screen: ScreenId) => void;
@@ -27,44 +27,44 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
   onNavigate,
 }) => {
   const [mobileStep, setMobileStep] = useState<
-    'intro' | 'info' | 'question' | 'sorting' | 'result'
-  >('intro');
+    "intro" | "info" | "question" | "sorting" | "result"
+  >("intro");
   const [currentQ, setCurrentQ] = useState(0);
-  const [selectedOpt, setSelectedOpt] = useState<string>('');
-  const [mobileName, setMobileName] = useState('Brahim Mihoubi');
-  const [mobileEmail, setMobileEmail] = useState('brahim.m@univ-setif.dz');
-  const [mobileDept, setMobileDept] = useState<DepartmentId>('development');
+  const [selectedOpt, setSelectedOpt] = useState<string>("");
+  const [mobileName, setMobileName] = useState("Brahim Mihoubi");
+  const [mobileEmail, setMobileEmail] = useState("brahim.m@univ-setif.dz");
+  const [mobileDept, setMobileDept] = useState<DepartmentId>("development");
 
   const startTest = () => {
     sounds.playClick();
-    setMobileStep('info');
+    setMobileStep("info");
   };
 
   const submitInfo = () => {
     sounds.playClick();
-    setMobileStep('question');
+    setMobileStep("question");
   };
 
   const handleNextQ = () => {
     sounds.playClick();
     if (currentQ < 2) {
       setCurrentQ(currentQ + 1);
-      setSelectedOpt('');
+      setSelectedOpt("");
     } else {
-      setMobileStep('sorting');
+      setMobileStep("sorting");
       sounds.playSortingResonance();
       setTimeout(() => {
         sounds.playRevealFanfare();
-        setMobileStep('result');
+        setMobileStep("result");
       }, 2200);
     }
   };
 
   const resetMobileFlow = () => {
     sounds.playClick();
-    setMobileStep('intro');
+    setMobileStep("intro");
     setCurrentQ(0);
-    setSelectedOpt('');
+    setSelectedOpt("");
   };
 
   return (
@@ -78,8 +78,8 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
           Mobile Flow Experience
         </h1>
         <p className="text-xs sm:text-sm text-amber-200/70 max-w-xl mx-auto">
-          Optimized for seamless smartphone participation during Welcome Day auditoriums and QR
-          code scans.
+          Optimized for seamless smartphone participation during Welcome Day
+          auditoriums and QR code scans.
         </p>
       </div>
 
@@ -107,13 +107,17 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
                 <div className="w-6 h-6 rounded bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs font-bold">
                   S
                 </div>
-                <span className="font-fantasy text-xs font-bold text-amber-200">SDG Sorting</span>
+                <span className="font-fantasy text-xs font-bold text-amber-200">
+                  SDG Sorting
+                </span>
               </div>
-              <span className="text-[10px] font-mono text-amber-400/70">Univ Sétif 1</span>
+              <span className="text-[10px] font-mono text-amber-400/70">
+                Univ Sétif 1
+              </span>
             </div>
 
             {/* Step 1: Intro */}
-            {mobileStep === 'intro' && (
+            {mobileStep === "intro" && (
               <div className="relative z-10 py-6 space-y-4 text-center my-auto">
                 <img
                   src={ASSETS.hatCloseup}
@@ -124,7 +128,8 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
                   Every mind has a place.
                 </h3>
                 <p className="text-xs text-amber-200/75 leading-relaxed">
-                  Discover your strengths and find your department in the SDG tech family.
+                  Discover your strengths and find your department in the SDG
+                  tech family.
                 </p>
                 <button
                   onClick={startTest}
@@ -137,10 +142,12 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
             )}
 
             {/* Step 2: Information */}
-            {mobileStep === 'info' && (
+            {mobileStep === "info" && (
               <div className="relative z-10 py-4 space-y-3.5 my-auto">
                 <div className="text-center">
-                  <div className="text-[10px] font-fantasy text-amber-400">STEP 1 OF 3</div>
+                  <div className="text-[10px] font-fantasy text-amber-400">
+                    STEP 1 OF 3
+                  </div>
                   <h4 className="font-fantasy font-bold text-lg text-amber-100">
                     Your Information
                   </h4>
@@ -190,7 +197,7 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
             )}
 
             {/* Step 3: Questions */}
-            {mobileStep === 'question' && (
+            {mobileStep === "question" && (
               <div className="relative z-10 py-4 space-y-3 my-auto">
                 <div className="flex items-center justify-between text-[11px] text-amber-400 font-mono">
                   <span>Question {currentQ + 1} of 3</span>
@@ -216,12 +223,16 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
                         onClick={() => setSelectedOpt(opt.id)}
                         className={`w-full text-left p-2.5 rounded-xl border text-xs flex items-center justify-between transition-all ${
                           isSel
-                            ? 'bg-amber-500/20 border-amber-400 text-amber-100'
-                            : 'bg-slate-900/80 border-slate-800 text-slate-300'
+                            ? "bg-amber-500/20 border-amber-400 text-amber-100"
+                            : "bg-slate-900/80 border-slate-800 text-slate-300"
                         }`}
                       >
-                        <span className="font-medium text-[11px]">{opt.text}</span>
-                        {isSel && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                        <span className="font-medium text-[11px]">
+                          {opt.text}
+                        </span>
+                        {isSel && (
+                          <Check className="w-3.5 h-3.5 text-amber-400" />
+                        )}
                       </button>
                     );
                   })}
@@ -232,18 +243,20 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
                   disabled={!selectedOpt}
                   className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
                     selectedOpt
-                      ? 'bg-amber-600 text-slate-950'
-                      : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      ? "bg-amber-600 text-slate-950"
+                      : "bg-slate-800 text-slate-500 cursor-not-allowed"
                   }`}
                 >
-                  <span>{currentQ === 2 ? 'Sort Me Now!' : 'Next Question'}</span>
+                  <span>
+                    {currentQ === 2 ? "Sort Me Now!" : "Next Question"}
+                  </span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
 
             {/* Step 4: Sorting Animation */}
-            {mobileStep === 'sorting' && (
+            {mobileStep === "sorting" && (
               <div className="relative z-10 py-6 text-center space-y-4 my-auto">
                 <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full border-2 border-amber-400/50 animate-spin" />
@@ -263,7 +276,7 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
             )}
 
             {/* Step 5: Sorting Result */}
-            {mobileStep === 'result' && (
+            {mobileStep === "result" && (
               <div className="relative z-10 py-4 space-y-3 text-center my-auto">
                 <div className="text-[10px] font-fantasy tracking-wider uppercase text-amber-400 font-bold">
                   ASSIGNED DEPARTMENT
@@ -279,7 +292,9 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
                 </p>
 
                 <div className="p-3 rounded-xl bg-slate-900/80 border border-amber-900/30 text-left text-[11px] space-y-1">
-                  <span className="font-bold text-amber-200 block">Your Key Strengths:</span>
+                  <span className="font-bold text-amber-200 block">
+                    Your Key Strengths:
+                  </span>
                   <div className="flex flex-wrap gap-1 pt-1">
                     <span className="px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 text-[10px]">
                       Problem Solving
@@ -295,7 +310,7 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
 
                 <div className="space-y-2 pt-2">
                   <button
-                    onClick={() => onNavigate('member_profile')}
+                    onClick={() => onNavigate("member_profile")}
                     className="w-full py-2.5 rounded-xl bg-amber-600 text-slate-950 font-bold text-xs"
                   >
                     View Full Profile
@@ -329,8 +344,9 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
               <span>Mobile-First Welcome Day</span>
             </h3>
             <p className="text-xs sm:text-sm text-amber-900/85 leading-relaxed">
-              During the annual Welcome Day event in Sétif, hundreds of university students scan the
-              stage QR code with their mobile devices. The mobile experience features:
+              During the annual Welcome Day event in Sétif, hundreds of
+              university students scan the stage QR code with their mobile
+              devices. The mobile experience features:
             </p>
             <ul className="space-y-2 text-xs text-amber-950/90 font-medium">
               <li className="flex items-center gap-2">
@@ -339,11 +355,15 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-emerald-700 font-bold">✓</span>
-                <span>Zero network bloat with instantaneous question transitions</span>
+                <span>
+                  Zero network bloat with instantaneous question transitions
+                </span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-emerald-700 font-bold">✓</span>
-                <span>Real-time sync to the stage projector & admin analytics</span>
+                <span>
+                  Real-time sync to the stage projector & admin analytics
+                </span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-emerald-700 font-bold">✓</span>
@@ -357,13 +377,14 @@ export const Screen12MobileFlow: FC<Screen12MobileFlowProps> = ({
               Interactive Test Controls
             </h4>
             <p className="text-xs text-amber-200/70">
-              Use the phone simulator on the left to try out the fast mobile onboarding flow, or
-              jump directly to any of the full desktop screens.
+              Use the phone simulator on the left to try out the fast mobile
+              onboarding flow, or jump directly to any of the full desktop
+              screens.
             </p>
             <button
               onClick={() => {
                 sounds.playClick();
-                onNavigate('welcome');
+                onNavigate("welcome");
               }}
               className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >

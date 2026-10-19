@@ -1,7 +1,7 @@
-import { FC, useState } from 'react';
-import { ParticipantInfo, ScreenId } from '../types';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
+import { FC, useState } from "react";
+import { ParticipantInfo, ScreenId } from "../types";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
 import {
   User,
   Mail,
@@ -18,7 +18,7 @@ import {
   Download,
   Share2,
   Edit3,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Screen10MemberProfileProps {
   participant: ParticipantInfo;
@@ -30,8 +30,8 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
   onNavigate,
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'result' | 'answers' | 'department' | 'activities' | 'certificates'
-  >('result');
+    "result" | "answers" | "department" | "activities" | "certificates"
+  >("result");
   const [showCertificateModal, setShowCertificateModal] = useState(false);
 
   return (
@@ -53,22 +53,22 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
 
             <div className="space-y-1.5">
               <h1 className="text-2xl sm:text-3xl font-bold font-fantasy text-amber-100">
-                {participant.fullName || 'Brahim Mihoubi'}
+                {participant.fullName || "Brahim Mihoubi"}
               </h1>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-amber-200/80">
                 <span className="flex items-center gap-1 font-mono">
                   <Mail className="w-3.5 h-3.5 text-amber-400" />
-                  {participant.email || 'brahim.m@univ-setif.dz'}
+                  {participant.email || "brahim.m@univ-setif.dz"}
                 </span>
                 <span>·</span>
                 <span className="flex items-center gap-1">
                   <Building2 className="w-3.5 h-3.5 text-amber-400" />
-                  {participant.faculty || 'Computer Science Department'}
+                  {participant.faculty || "Computer Science Department"}
                 </span>
                 <span>·</span>
                 <span className="flex items-center gap-1 font-mono">
                   <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
-                  {participant.studyYear || 'Master 1'}
+                  {participant.studyYear || "Master 1"}
                 </span>
               </div>
             </div>
@@ -89,11 +89,11 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
       {/* Tabs Navigation (Matching Screenshot 10) */}
       <div className="flex items-center gap-2 overflow-x-auto border-b border-amber-900/30 pb-1 scrollbar-none">
         {[
-          { id: 'result', label: 'My Result', icon: Sparkles },
-          { id: 'answers', label: 'My Answers', icon: BookOpen },
-          { id: 'department', label: 'Department Info', icon: Building2 },
-          { id: 'activities', label: 'Activities', icon: Calendar },
-          { id: 'certificates', label: 'Certificates', icon: Award },
+          { id: "result", label: "My Result", icon: Sparkles },
+          { id: "answers", label: "My Answers", icon: BookOpen },
+          { id: "department", label: "Department Info", icon: Building2 },
+          { id: "activities", label: "Activities", icon: Calendar },
+          { id: "certificates", label: "Certificates", icon: Award },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -106,8 +106,8 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
               }}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? 'bg-amber-500/20 text-amber-200 border border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
-                  : 'text-amber-100/60 hover:text-amber-200 hover:bg-slate-900/50'
+                  ? "bg-amber-500/20 text-amber-200 border border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                  : "text-amber-100/60 hover:text-amber-200 hover:bg-slate-900/50"
               }`}
             >
               <Icon className="w-4 h-4 text-amber-400" />
@@ -118,7 +118,7 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
       </div>
 
       {/* Tab 1: My Result */}
-      {activeTab === 'result' && (
+      {activeTab === "result" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Main Sorting Highlight Card (lg:col-span-8) (Matching Image 4) */}
           <div className="lg:col-span-8 space-y-6">
@@ -134,9 +134,10 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                   &ldquo;Turning ideas into real solutions.&rdquo;
                 </p>
                 <p className="text-xs sm:text-sm text-amber-900/90 max-w-xl mx-auto pt-2 leading-relaxed font-serif">
-                  You showed strong analytical thinking, problem solving skills and a passion for
-                  building things. You enjoy turning ideas into real, working solutions and creating
-                  impact through technology.
+                  You showed strong analytical thinking, problem solving skills
+                  and a passion for building things. You enjoy turning ideas
+                  into real, working solutions and creating impact through
+                  technology.
                 </p>
               </div>
 
@@ -171,7 +172,9 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                       <Code className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-bold text-xs text-amber-100">Real Projects</div>
+                      <div className="font-bold text-xs text-amber-100">
+                        Real Projects
+                      </div>
                       <div className="text-[11px] text-amber-200/60 mt-0.5">
                         Work on web & mobile applications
                       </div>
@@ -183,7 +186,9 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-bold text-xs text-amber-100">Technical Workshops</div>
+                      <div className="font-bold text-xs text-amber-100">
+                        Technical Workshops
+                      </div>
                       <div className="text-[11px] text-amber-200/60 mt-0.5">
                         Learn and improve your skills
                       </div>
@@ -195,7 +200,9 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                       <User className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-bold text-xs text-amber-100">Community Collaboration</div>
+                      <div className="font-bold text-xs text-amber-100">
+                        Community Collaboration
+                      </div>
                       <div className="text-[11px] text-amber-200/60 mt-0.5">
                         Build solutions with talented developers
                       </div>
@@ -207,7 +214,9 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                       <Award className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-bold text-xs text-amber-100">Innovation & Impact</div>
+                      <div className="font-bold text-xs text-amber-100">
+                        Innovation & Impact
+                      </div>
                       <div className="text-[11px] text-amber-200/60 mt-0.5">
                         Contribute to meaningful tech projects
                       </div>
@@ -232,8 +241,12 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                     ✓
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-amber-100">Profile Completed</div>
-                    <div className="text-[10px] text-slate-400 font-mono">Sep 27, 2026 · 14:32</div>
+                    <div className="text-xs font-bold text-amber-100">
+                      Profile Completed
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono">
+                      Sep 27, 2026 · 14:32
+                    </div>
                   </div>
                 </div>
 
@@ -242,8 +255,12 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                     ✓
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-amber-100">Questionnaire Completed</div>
-                    <div className="text-[10px] text-slate-400 font-mono">Sep 27, 2026 · 14:40</div>
+                    <div className="text-xs font-bold text-amber-100">
+                      Questionnaire Completed
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono">
+                      Sep 27, 2026 · 14:40
+                    </div>
                   </div>
                 </div>
 
@@ -252,8 +269,12 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                     3
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-amber-300">Sorted into Development</div>
-                    <div className="text-[10px] text-amber-400/70 font-mono">Sep 27, 2026 · 14:41</div>
+                    <div className="text-xs font-bold text-amber-300">
+                      Sorted into Development
+                    </div>
+                    <div className="text-[10px] text-amber-400/70 font-mono">
+                      Sep 27, 2026 · 14:41
+                    </div>
                   </div>
                 </div>
 
@@ -262,8 +283,12 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                     4
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-slate-300">Joined SDG Fellowship</div>
-                    <div className="text-[10px] text-slate-500">Welcome Day Induction</div>
+                    <div className="text-xs font-semibold text-slate-300">
+                      Joined SDG Fellowship
+                    </div>
+                    <div className="text-[10px] text-slate-500">
+                      Welcome Day Induction
+                    </div>
                   </div>
                 </div>
               </div>
@@ -279,7 +304,7 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                 <button
                   onClick={() => {
                     sounds.playClick();
-                    onNavigate('department_detail');
+                    onNavigate("department_detail");
                   }}
                   className="w-full p-2.5 rounded-xl bg-slate-950/60 hover:bg-slate-800 text-left border border-amber-900/20 flex items-center justify-between group transition-colors"
                 >
@@ -297,7 +322,7 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                 <button
                   onClick={() => {
                     sounds.playClick();
-                    onNavigate('event_mode');
+                    onNavigate("event_mode");
                   }}
                   className="w-full p-2.5 rounded-xl bg-slate-950/60 hover:bg-slate-800 text-left border border-amber-900/20 flex items-center justify-between group transition-colors"
                 >
@@ -315,7 +340,7 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
                 <button
                   onClick={() => {
                     sounds.playChime(620);
-                    setActiveTab('certificates');
+                    setActiveTab("certificates");
                   }}
                   className="w-full p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-left border border-amber-500/30 flex items-center justify-between group transition-colors"
                 >
@@ -336,7 +361,7 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
       )}
 
       {/* Tab: Certificates */}
-      {activeTab === 'certificates' && (
+      {activeTab === "certificates" && (
         <div className="p-8 rounded-2xl bg-gradient-to-b from-[#131525] to-[#090b12] border border-amber-500/40 text-center space-y-6 shadow-2xl">
           <div className="max-w-2xl mx-auto parchment-card p-8 rounded-2xl border-4 border-amber-900/40 shadow-2xl space-y-4 text-amber-950">
             <div className="text-xs font-fantasy tracking-widest uppercase font-bold text-amber-900">
@@ -349,16 +374,20 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
               This hereby certifies that
             </p>
             <div className="text-xl sm:text-2xl font-fantasy font-bold text-amber-900 underline decoration-amber-600 decoration-2">
-              {participant.fullName || 'Brahim Mihoubi'}
+              {participant.fullName || "Brahim Mihoubi"}
             </div>
             <p className="text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
-              has completed the official SDG Sorting Hat evaluation and has been solemnly designated
-              into the <strong>Development Department</strong> for the 2026/2027 academic session.
+              has completed the official SDG Sorting Hat evaluation and has been
+              solemnly designated into the{" "}
+              <strong>Development Department</strong> for the 2026/2027 academic
+              session.
             </p>
 
             <div className="pt-4 flex items-center justify-between border-t border-amber-900/30 text-xs font-mono">
               <div>Date: Sep 28, 2026</div>
-              <div className="font-fantasy font-bold text-amber-900">SDG Sorting Council</div>
+              <div className="font-fantasy font-bold text-amber-900">
+                SDG Sorting Council
+              </div>
             </div>
           </div>
 
@@ -378,7 +407,7 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
       )}
 
       {/* Tab: My Answers */}
-      {activeTab === 'answers' && (
+      {activeTab === "answers" && (
         <div className="p-6 rounded-2xl bg-slate-900/80 border border-amber-900/30 space-y-4">
           <h3 className="font-fantasy font-bold text-base text-amber-200">
             Your Recorded Responses
@@ -388,19 +417,37 @@ export const Screen10MemberProfile: FC<Screen10MemberProfileProps> = ({
           </p>
           <div className="space-y-3 text-xs">
             <div className="p-3.5 rounded-xl bg-slate-950/70 border border-amber-900/30">
-              <span className="text-amber-400 font-semibold">Q1: Activity Preference</span>
-              <div className="text-amber-100 font-bold mt-1">Build an application (Turn ideas into real solutions)</div>
-              <span className="text-[10px] text-emerald-400 font-mono">+10 Development points</span>
+              <span className="text-amber-400 font-semibold">
+                Q1: Activity Preference
+              </span>
+              <div className="text-amber-100 font-bold mt-1">
+                Build an application (Turn ideas into real solutions)
+              </div>
+              <span className="text-[10px] text-emerald-400 font-mono">
+                +10 Development points
+              </span>
             </div>
             <div className="p-3.5 rounded-xl bg-slate-950/70 border border-amber-900/30">
-              <span className="text-amber-400 font-semibold">Q2: Problem Attraction</span>
-              <div className="text-amber-100 font-bold mt-1">Technical systems, complex logic and algorithms</div>
-              <span className="text-[10px] text-emerald-400 font-mono">+10 Development points</span>
+              <span className="text-amber-400 font-semibold">
+                Q2: Problem Attraction
+              </span>
+              <div className="text-amber-100 font-bold mt-1">
+                Technical systems, complex logic and algorithms
+              </div>
+              <span className="text-[10px] text-emerald-400 font-mono">
+                +10 Development points
+              </span>
             </div>
             <div className="p-3.5 rounded-xl bg-slate-950/70 border border-amber-900/30">
-              <span className="text-amber-400 font-semibold">Q3: Project Motivation</span>
-              <div className="text-amber-100 font-bold mt-1">Practical high-impact results with functioning code</div>
-              <span className="text-[10px] text-emerald-400 font-mono">+10 Development points</span>
+              <span className="text-amber-400 font-semibold">
+                Q3: Project Motivation
+              </span>
+              <div className="text-amber-100 font-bold mt-1">
+                Practical high-impact results with functioning code
+              </div>
+              <span className="text-[10px] text-emerald-400 font-mono">
+                +10 Development points
+              </span>
             </div>
           </div>
         </div>

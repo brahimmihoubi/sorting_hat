@@ -1,10 +1,10 @@
-import type { FC } from 'react';
-import { ScreenId } from '../types';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
-import { WizardStepper } from '../components/WizardStepper';
-import { GoldenHatButton } from '../components/GoldenHatButton';
-import { Code, Palette, Calendar, Megaphone, BookOpen } from 'lucide-react';
+import type { FC } from "react";
+import { ScreenId } from "../types";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
+import { WizardStepper } from "../components/WizardStepper";
+import { GoldenHatButton } from "../components/GoldenHatButton";
+import { Code, Palette, Calendar, Megaphone, BookOpen } from "lucide-react";
 
 interface Screen2WelcomeProps {
   onNext: () => void;
@@ -27,9 +27,9 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
             {/* Header Kicker */}
             <div className="text-center space-y-3 mb-8">
               <p className="text-sm sm:text-base text-amber-950 font-serif max-w-2xl mx-auto leading-relaxed">
-                This is more than a questionnaire. It&apos;s a journey to discover your
-                strengths, interests, and the place where you can make the biggest impact
-                in our community.
+                This is more than a questionnaire. It&apos;s a journey to
+                discover your strengths, interests, and the place where you can
+                make the biggest impact in our community.
               </p>
             </div>
 
@@ -46,7 +46,9 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
                   <Code className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">Development</h4>
+                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">
+                    Development
+                  </h4>
                   <p className="text-xs sm:text-sm text-amber-900/85 leading-relaxed font-sans">
                     Build, develop and turn ideas into real solutions.
                   </p>
@@ -59,7 +61,9 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
                   <Palette className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">Design</h4>
+                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">
+                    Design
+                  </h4>
                   <p className="text-xs sm:text-sm text-amber-900/85 leading-relaxed font-sans">
                     Create beautiful visuals and meaningful experiences.
                   </p>
@@ -72,9 +76,12 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
                   <Calendar className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">Events</h4>
+                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">
+                    Events
+                  </h4>
                   <p className="text-xs sm:text-sm text-amber-900/85 leading-relaxed font-sans">
-                    Organize, plan and bring people together through impactful events.
+                    Organize, plan and bring people together through impactful
+                    events.
                   </p>
                 </div>
               </div>
@@ -85,7 +92,9 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
                   <Megaphone className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">Social Media</h4>
+                  <h4 className="font-fantasy font-bold text-amber-950 text-lg sm:text-xl">
+                    Social Media
+                  </h4>
                   <p className="text-xs sm:text-sm text-amber-900/85 leading-relaxed font-sans">
                     Share ideas, create content and grow our community online.
                   </p>
@@ -97,7 +106,10 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
             <div className="inset-parchment-box p-5 sm:p-6 flex items-start gap-4 text-amber-950 my-6">
               <BookOpen className="w-8 h-8 text-amber-800 shrink-0 mt-0.5" />
               <p className="text-xs sm:text-sm text-amber-900/90 leading-relaxed font-serif">
-                You will answer a few questions about your interests and preferences. At the end, the Sorting Hat will analyze your answers and assign you to the department where you can truly belong.
+                You will answer a few questions about your interests and
+                preferences. At the end, the Sorting Hat will analyze your
+                answers and assign you to the department where you can truly
+                belong.
               </p>
             </div>
 
@@ -136,4 +148,3 @@ export const Screen2Welcome: FC<Screen2WelcomeProps> = ({
     </div>
   );
 };
-

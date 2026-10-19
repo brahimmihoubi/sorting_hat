@@ -1,11 +1,11 @@
-import type { FC } from 'react';
-import { ScreenId } from '../types';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
-import { DEPARTMENTS } from '../data/departments';
-import { GoldenHatButton } from '../components/GoldenHatButton';
-import { DepartmentHeraldicCard } from '../components/DepartmentHeraldicCard';
-import { Users, Star, Sparkles, TrendingUp, ChevronDown } from 'lucide-react';
+import type { FC } from "react";
+import { ScreenId } from "../types";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
+import { DEPARTMENTS } from "../data/departments";
+import { GoldenHatButton } from "../components/GoldenHatButton";
+import { DepartmentHeraldicCard } from "../components/DepartmentHeraldicCard";
+import { Users, Star, Sparkles, TrendingUp, ChevronDown } from "lucide-react";
 
 interface Screen1LandingProps {
   onStartJourney: () => void;
@@ -42,8 +42,8 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
 
             {/* Subtitle */}
             <p className="text-base sm:text-lg text-amber-100/75 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
-              Discover your strengths, explore new opportunities, and find the department
-              where you truly belong in the SDG family.
+              Discover your strengths, explore new opportunities, and find the
+              department where you truly belong in the SDG family.
             </p>
 
             {/* Primary Golden Notched Action Buttons */}
@@ -122,7 +122,9 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
           <div className="w-5 h-8 rounded-full border-2 border-amber-500/30 flex items-start justify-center p-1">
             <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce" />
           </div>
-          <span className="mt-1 text-[11px] tracking-widest uppercase">Scroll to explore</span>
+          <span className="mt-1 text-[11px] tracking-widest uppercase">
+            Scroll to explore
+          </span>
           <ChevronDown className="w-3.5 h-3.5 animate-pulse mt-0.5" />
         </div>
       </div>
@@ -137,7 +139,8 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
             Explore the SDG Departments
           </h2>
           <p className="text-sm text-amber-200/70 max-w-xl mx-auto font-sans">
-            Every department offers a distinct environment to hone your skills, build real-world tools, and collaborate with passionate peers.
+            Every department offers a distinct environment to hone your skills,
+            build real-world tools, and collaborate with passionate peers.
           </p>
         </div>
 
@@ -146,7 +149,7 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
             <DepartmentHeraldicCard
               key={dept.id}
               department={dept}
-              onLearnMore={() => onNavigate('department_detail')}
+              onLearnMore={() => onNavigate("department_detail")}
             />
           ))}
         </div>
@@ -161,8 +164,12 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-semibold text-xs sm:text-sm text-amber-100">4 Departments</div>
-              <div className="text-[11px] text-amber-200/60">Development, Design, Events, Social Media</div>
+              <div className="font-semibold text-xs sm:text-sm text-amber-100">
+                4 Departments
+              </div>
+              <div className="text-[11px] text-amber-200/60">
+                Development, Design, Events, Social Media
+              </div>
             </div>
           </div>
 
@@ -172,8 +179,12 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
               <Star className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-semibold text-xs sm:text-sm text-amber-100">Personalized Experience</div>
-              <div className="text-[11px] text-amber-200/60">A unique journey based on your strengths</div>
+              <div className="font-semibold text-xs sm:text-sm text-amber-100">
+                Personalized Experience
+              </div>
+              <div className="text-[11px] text-amber-200/60">
+                A unique journey based on your strengths
+              </div>
             </div>
           </div>
 
@@ -183,8 +194,12 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-semibold text-xs sm:text-sm text-amber-100">Be Part of Community</div>
-              <div className="text-[11px] text-amber-200/60">Meet passionate people and grow together</div>
+              <div className="font-semibold text-xs sm:text-sm text-amber-100">
+                Be Part of Community
+              </div>
+              <div className="text-[11px] text-amber-200/60">
+                Meet passionate people and grow together
+              </div>
             </div>
           </div>
 
@@ -194,8 +209,12 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-semibold text-xs sm:text-sm text-amber-100">New Opportunities</div>
-              <div className="text-[11px] text-amber-200/60">Work on real projects and make an impact</div>
+              <div className="font-semibold text-xs sm:text-sm text-amber-100">
+                New Opportunities
+              </div>
+              <div className="text-[11px] text-amber-200/60">
+                Work on real projects and make an impact
+              </div>
             </div>
           </div>
         </div>
@@ -203,4 +222,3 @@ export const Screen1Landing: FC<Screen1LandingProps> = ({
     </div>
   );
 };
-

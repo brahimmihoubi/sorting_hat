@@ -1,8 +1,8 @@
-import { FC, useState } from 'react';
-import { DepartmentId, ScreenId } from '../types';
-import { DEPARTMENTS } from '../data/departments';
-import { sounds } from '../utils/audio';
-import { ASSETS } from '../assets';
+import { FC, useState } from "react";
+import { DepartmentId, ScreenId } from "../types";
+import { DEPARTMENTS } from "../data/departments";
+import { sounds } from "../utils/audio";
+import { ASSETS } from "../public/assets";
 import {
   Code,
   Palette,
@@ -17,7 +17,7 @@ import {
   Target,
   Users2,
   Check,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Screen8DepartmentDetailProps {
   departmentId: DepartmentId;
@@ -45,13 +45,13 @@ export const Screen8DepartmentDetail: FC<Screen8DepartmentDetailProps> = ({
 
   const getDeptIcon = () => {
     switch (departmentId) {
-      case 'development':
+      case "development":
         return <Code className="w-8 h-8" />;
-      case 'design':
+      case "design":
         return <Palette className="w-8 h-8" />;
-      case 'events':
+      case "events":
         return <Calendar className="w-8 h-8" />;
-      case 'social_media':
+      case "social_media":
         return <Megaphone className="w-8 h-8" />;
     }
   };
@@ -145,7 +145,8 @@ export const Screen8DepartmentDetail: FC<Screen8DepartmentDetailProps> = ({
           </div>
 
           <div className="mt-6 pt-4 border-t border-amber-900/20 text-xs text-amber-900/70 italic">
-            Activities happen weekly at the SDG Tech Hub and online Discord community.
+            Activities happen weekly at the SDG Tech Hub and online Discord
+            community.
           </div>
         </div>
 
@@ -233,14 +234,15 @@ export const Screen8DepartmentDetail: FC<Screen8DepartmentDetailProps> = ({
               Ready to start your journey?
             </h4>
             <p className="text-xs text-amber-200/70 leading-snug">
-              Join the {dept.name} Department and turn your ideas into real solutions.
+              Join the {dept.name} Department and turn your ideas into real
+              solutions.
             </p>
 
             <button
               onClick={handleApply}
               disabled={applied}
               className={`btn-notch-primary w-full py-2.5 px-4 text-xs flex items-center justify-center gap-2 ${
-                applied ? 'opacity-70 cursor-not-allowed' : ''
+                applied ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
               {applied ? (

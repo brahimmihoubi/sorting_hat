@@ -1,5 +1,5 @@
-import { useEffect, useRef, FC } from 'react';
-import { ASSETS } from '../assets';
+import { useEffect, useRef, FC } from "react";
+import { ASSETS } from "../public/assets";
 
 interface MagicalBackgroundProps {
   opacity?: number;
@@ -14,7 +14,7 @@ export const MagicalBackground: FC<MagicalBackgroundProps> = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     let animationId: number;
@@ -26,7 +26,7 @@ export const MagicalBackground: FC<MagicalBackgroundProps> = ({
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Floating magical golden dust particles
     const particleCount = 45;
@@ -60,7 +60,7 @@ export const MagicalBackground: FC<MagicalBackgroundProps> = ({
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(245, 197, 66, ${Math.max(0.1, currentOpacity)})`;
-        ctx.shadowColor = 'rgba(234, 179, 8, 0.8)';
+        ctx.shadowColor = "rgba(234, 179, 8, 0.8)";
         ctx.shadowBlur = 8;
         ctx.fill();
       });
@@ -71,7 +71,7 @@ export const MagicalBackground: FC<MagicalBackgroundProps> = ({
     render();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationId);
     };
   }, []);
