@@ -1,7 +1,7 @@
 import { useState, FC } from "react";
 import { apiService } from "../services/api";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import {
   ShieldCheck,
   KeyRound,

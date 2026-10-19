@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { ScreenId } from "../types";
 import { QUESTIONS } from "../data/questions";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import { WizardStepper } from "../components/WizardStepper";
 import {
   Laptop,

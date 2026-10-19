@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { ScreenId } from "../types";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import { WizardStepper } from "../components/WizardStepper";
 import { GoldenHatButton } from "../components/GoldenHatButton";
 import { Code, Palette, Calendar, Megaphone, BookOpen } from "lucide-react";

@@ -1,5 +1,5 @@
 import { useEffect, useRef, FC } from "react";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 
 interface MagicalBackgroundProps {
   opacity?: number;

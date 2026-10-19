@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { DepartmentId, ScreenId } from "../types";
 import { DEPARTMENTS } from "../data/departments";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import {
   Code,
   Palette,

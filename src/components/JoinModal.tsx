@@ -1,7 +1,7 @@
 import { useState, FC, FormEvent } from "react";
 import { DepartmentId } from "../types";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import { X, Check, Sparkles, Send } from "lucide-react";
 
 interface JoinModalProps {

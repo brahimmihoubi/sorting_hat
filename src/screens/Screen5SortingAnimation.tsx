@@ -1,7 +1,7 @@
 import { FC, useEffect, useState, useMemo } from "react";
 import { DepartmentId, ScreenId } from "../types";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import { DEPARTMENTS } from "../data/departments";
 import { QUESTIONS } from "../data/questions";
 import { WizardStepper } from "../components/WizardStepper";

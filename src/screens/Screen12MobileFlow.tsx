@@ -3,7 +3,7 @@ import { DepartmentId, ParticipantInfo, ScreenId } from "../types";
 import { DEPARTMENTS } from "../data/departments";
 import { QUESTIONS } from "../data/questions";
 import { sounds } from "../utils/audio";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import {
   Smartphone,
   Sparkles,

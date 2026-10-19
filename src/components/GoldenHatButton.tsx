@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ASSETS } from "../public/assets";
+import { ASSETS } from "../../public/assets";
 import { sounds } from "../utils/audio";
 
 interface GoldenHatButtonProps {
