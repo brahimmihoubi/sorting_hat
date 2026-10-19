@@ -2,6 +2,7 @@ import { useState, FC } from "react";
 import { ScreenId } from "../types";
 import { ASSETS } from "../config/assets";
 import { sounds } from "../utils/audio";
+import { apiService } from "../services/api";
 import { Volume2, VolumeX, Music, MonitorPlay } from "lucide-react";
 
 interface NavbarProps {
@@ -133,7 +134,7 @@ export const Navbar: FC<NavbarProps> = ({
                 onOpenApiConnector();
               }}
               className="h-9 px-3 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 text-emerald-400 flex items-center gap-1.5 text-xs font-mono font-semibold transition-all cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.15)]"
-              title="FastAPI Backend API Connector (http://localhost:8000/api)"
+              title={`FastAPI Backend API Connector (${apiService.getBaseUrl()})`}
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="hidden sm:inline">API 8000</span>

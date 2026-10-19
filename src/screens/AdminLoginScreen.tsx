@@ -81,7 +81,7 @@ export const AdminLoginScreen: FC<AdminLoginScreenProps> = ({
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-emerald-500/40 text-[11px] font-mono text-emerald-400">
             <Server className="w-3.5 h-3.5" />
-            <span>FastAPI http://localhost:8000/api</span>
+            <span>FastAPI {apiService.getBaseUrl()}</span>
           </div>
         </div>
 
